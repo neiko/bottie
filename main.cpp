@@ -19,13 +19,13 @@
  ***************************************************************************/
 
 #include <QtCore/QCoreApplication>
-#include "irc.h"
+#include "lurker.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Irc irc;
+    Lurker lurker;
 
     return a.exec();
 }

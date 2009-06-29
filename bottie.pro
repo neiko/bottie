@@ -4,9 +4,12 @@
 QT += network
 QT -= gui
 TARGET = bottie
-CONFIG += console
+CONFIG += console \
+    static
 CONFIG -= app_bundle
 TEMPLATE = app
 SOURCES += main.cpp \
-    irc.cpp
-HEADERS += irc.h
+    irc.cpp \
+    lurker.cpp
+HEADERS += irc.h \
+    lurker.h

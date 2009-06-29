@@ -31,24 +31,38 @@
 #define STATUS_IDLE 3
 #define STATUS_QUITTING 4
 
-#define OUT 0
-#define OUT_CLEAN 1
-#define OUT_COLORED 2
-
 class Irc : public QObject
 {
 Q_OBJECT
 
 public:
-  Irc();
-
-private:
-  void out(QString);
-  void out(QString,int);
-  void out(QString,int,int);
+  Irc(QString,int,QString,QString,QString,QString);
+  void goDisconnect();
   void sendData(QString);
   void sendData(QString, bool);
+  void goConnect();
+
+private:
   void parse(QString);
+
+signals:
+  void PingPong();
+  void gotConnection();
+  void gotDisconnection();
+  void ownNickChange(QString);
+  void join(QString,QString,QString);
+  void chanmsg(QString,QString,QString,QString);
+  void querymsg(QString,QString,QString);
+  void channotice(QString,QString,QString,QString);
+  void querynotice(QString,QString,QString);
+  void part(QString,QString,QString,QString);
+  void quit(QString,QString,QString);
+  void nickChange(QString,QString,QString);
+
+
+
+public slots:
+
 
 private slots:
   void readData();
@@ -63,8 +77,8 @@ private:
   int status;
   QString indata;
   QString chans;
-  QString ownNick;
   QString ident;
+  QString ownNick;
   QString realname;
 };
 

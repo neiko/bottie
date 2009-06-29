@@ -1,4 +1,4 @@
-- handle server, chans, and everything configurable using QConfig (because hardcoding sucks)
+Core module
 - handle EVERYTHING with signals! nothing inside irc.cpp should use out() because this bot is going to be scripted through
   external modules!
 - avoid assertion fails (how?)
@@ -14,3 +14,11 @@
 - SPLIT EVERYTHING IN MODULES!
 - mirc colors: handle them or wipe them
 - handle /me command
+- handle unhandled raws like MODE or TOPIC
+
+Lurker module
+- mode handling
+- o/c, nicklist on join
+- show chanmode before nick on chanmsg
+- show common channels on querymsg
+- handle server, chans, and everything configurable using QConfig (because hardcoding sucks)
