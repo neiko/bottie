@@ -26,9 +26,15 @@ Lurker::Lurker()
   connect(interface, SIGNAL(part(QString,QString,QString,QString)), this, SLOT(part(QString,QString,QString,QString)));
   connect(interface, SIGNAL(quit(QString,QString,QString)), this, SLOT(quit(QString,QString,QString)));
   connect(interface, SIGNAL(nickChange(QString,QString,QString)), this, SLOT(nickChange(QString,QString,QString)));
+  connect(interface, SIGNAL(connError(QString)), this, SLOT(connError(QString)));
 
 }
 
+
+void Lurker::out(QString mes) { // no se especificó tipo así que presupondré que será OUT y así ahorro teclado
+  QTextStream cout(stdout, QIODevice::WriteOnly);
+  cout << "\033[15;1m" << mes << "\033[0m";
+}
 
 void Lurker::out(QString mes, int type) {
   QTextStream cout(stdout, QIODevice::WriteOnly);
@@ -40,15 +46,20 @@ void Lurker::out(QString mes, int type) {
     qDebug() << "out() with wrong type!" << endl;
 }
 
-void Lurker::out(QString mes) { // no se especificó tipo así que presupondré que será OUT y así ahorro teclado
-  QTextStream cout(stdout, QIODevice::WriteOnly);
-  cout << "\033[15;1m" << mes << "\033[0m";
-}
-
 void Lurker::out(QString mes, int type, int colour) {
   QTextStream cout(stdout, QIODevice::WriteOnly);
   if (type == OUT_COLORED)
     cout << "\033[" << colour << ";2m" << mes << "\033[0m";
+  else
+    qDebug() << "out() with wrong type!" << endl;
+}
+
+void Lurker::out(QString mes, int type, int colour, bool notused) {
+  // truco sucio. no hace falta ver qué devuelve notused, si hemos llegado aquí, es porque
+  // queremos negrita. viva la sobrecarga de operadores :D
+  QTextStream cout(stdout, QIODevice::WriteOnly);
+  if (type == OUT_COLORED)
+    cout << "\033[" << colour << ";1m" << mes << "\033[0m";
   else
     qDebug() << "out() with wrong type!" << endl;
 }
@@ -179,4 +190,11 @@ void Lurker::nickChange(QString nick,QString mask,QString newnick) {
     out(QString(" changed nick to "),OUT_COLORED,36);
     out(newnick, OUT_COLORED, 36);
     out(QString("\n"));
+}
+
+void Lurker::connError(QString errdesc) {
+  timestamp();
+  out(errdesc + "\n", OUT_COLORED, 31, true);
+  // Sad but true, a connection error is FATAL for us.
+  exit(0);
 }

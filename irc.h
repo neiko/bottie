@@ -58,11 +58,9 @@ signals:
   void part(QString,QString,QString,QString);
   void quit(QString,QString,QString);
   void nickChange(QString,QString,QString);
-
-
+  void connError(QString);
 
 public slots:
-
 
 private slots:
   void readData();

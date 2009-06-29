@@ -79,6 +79,9 @@ void Irc::parse(QString raw) {
     sendData(indata);
     emit PingPong();
 
+  } else if ( matrix[0] == "ERROR" ) { // error de conexion, whichever
+    emit connError(raw.right(raw.length() - 7)); //quita el "ERROR :" del principio y deja el msj limpio
+
   } else if ( matrix[1] == "NOTICE" && matrix[2] == "IP_LOOKUP" && status == STATUS_LOGGING_IN) {
     //Inicio de sesión
     //out(QString("Iniciando sesion...\n"),OUT);

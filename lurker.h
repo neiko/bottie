@@ -31,6 +31,7 @@ private:
   void out(QString);
   void out(QString,int);
   void out(QString,int,int);
+  void out(QString,int,int,bool);
   void timestamp();
 
 signals:
@@ -48,5 +49,6 @@ public slots:
   void part(QString,QString,QString,QString);
   void quit(QString,QString,QString);
   void nickChange(QString,QString,QString);
+  void connError(QString);
 
 };
