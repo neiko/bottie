@@ -1,0 +1,7 @@
+bottie by egns
+
+Compile with `qmake && make`
+
+Some ideas (not code) taken from bot-chan -> http://code.google.com/p/bot-chan/
+
+Licensed under GPL
