@@ -41,10 +41,10 @@ Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString i
   connect( socket, SIGNAL( error( QAbstractSocket::SocketError ) ), this, SLOT( displayError( QAbstractSocket::SocketError ) ) );
 
   status = STATUS_LOGGING_IN;
-  socket->connectToHost( server, port );
 }
 
 void Irc::goConnect() {
+  socket->connectToHost( server, port );
 }
 
 void Irc::goDisconnect() {
@@ -161,6 +161,12 @@ void Irc::parse(QString raw) {
         sendData("JOIN ",true);
         sendData(chans);
         status = STATUS_IDLE;
+        break;
+      case 332: //topic
+        emit topic(matrix[3],raw.right((raw.length() - 2) - raw.indexOf(" :")));
+        break;
+      case 333: //topic timestamp
+        emit topicTime(matrix[3],matrix[4],matrix[5]);
         break;
       default:
         //qDebug() << "Numeric NO MANEJADO!" << matrix[1] << endl;

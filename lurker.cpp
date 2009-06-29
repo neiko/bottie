@@ -27,6 +27,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(quit(QString,QString,QString)), this, SLOT(quit(QString,QString,QString)));
   connect(interface, SIGNAL(nickChange(QString,QString,QString)), this, SLOT(nickChange(QString,QString,QString)));
   connect(interface, SIGNAL(connError(QString)), this, SLOT(connError(QString)));
+  connect(interface, SIGNAL(topic(QString,QString)), this, SLOT(topic(QString,QString)));
+  connect(interface, SIGNAL(topicTime(QString,QString,QString)), this, SLOT(topicTime(QString,QString,QString)));
 
 }
 
@@ -197,4 +199,24 @@ void Lurker::connError(QString errdesc) {
   out(errdesc + "\n", OUT_COLORED, 31, true);
   // Sad but true, a connection error is FATAL for us.
   exit(0);
+}
+
+void Lurker::topic(QString chan,QString topic_) {
+  timestamp();
+  out(QString("  -> Topic for "),OUT_COLORED,36);
+  out(chan);
+  out(QString(": "),OUT_COLORED,36);
+  out(topic_);
+  out(QString("\n"));
+}
+
+void Lurker::topicTime(QString chan,QString nick,QString tstamp) {
+  timestamp();
+  out(QString("  -> Topic for "),OUT_COLORED,36);
+  out(chan);
+  out(QString(" was set by "),OUT_COLORED,36);
+  out(nick);
+  out(QString(" on "),OUT_COLORED,36);
+  out(tstamp);
+  out(QString("\n"));
 }
