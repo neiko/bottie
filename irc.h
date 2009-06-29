@@ -53,6 +53,8 @@ signals:
   void join(QString,QString,QString);
   void chanmsg(QString,QString,QString,QString);
   void querymsg(QString,QString,QString);
+  void chanme(QString,QString,QString,QString);
+  void queryme(QString,QString,QString);
   void channotice(QString,QString,QString,QString);
   void querynotice(QString,QString,QString);
   void part(QString,QString,QString,QString);

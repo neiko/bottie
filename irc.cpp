@@ -23,7 +23,6 @@
 
 Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString iident, QString irealname)
 {
-  // TODO: handle this with QConfig
 
   server = iserver;
   port = iport;
@@ -106,9 +105,15 @@ void Irc::parse(QString raw) {
 
     if ( matrix[1] == "PRIVMSG" ) {
       if ( matrix[2].startsWith("#") ) { // mensaje de canal
-        emit chanmsg ( nick, mask, matrix[2], message );
+        if ( message.startsWith("ACTION ") ) // /me
+          emit chanme ( nick, mask, matrix[2], message.right((message.length() - 8)) );
+        else
+          emit chanmsg ( nick, mask, matrix[2], message );
       } else { // mensaje en privado
-        emit querymsg ( nick, mask, message );
+        if ( message.startsWith("ACTION ") ) // /me
+          emit queryme ( nick, mask, message.right((message.length() - 8)) );
+        else
+          emit querymsg ( nick, mask, message );
       }
     } else if ( matrix[1] == "NOTICE" ) {
       if ( matrix[2].startsWith("#") ) { // notice en canal

@@ -1,19 +1,11 @@
 Core module
-- handle EVERYTHING with signals! nothing inside irc.cpp should use out() because this bot is going to be scripted through
-  external modules!
 - avoid assertion fails (how?)
-- create a connection error handler, because the only clue we have if we got disconnected, is the signal sent by 
-  QTcpSocket, and it's too late to know why we disconnected :( it's very easy because it's sent in an only raw:
-     ERROR :Closing Link: invitado-124158 by urano2.irc-hispano.org (Quit: quit msg)
-  or whatever.
-- make separate procedures for privmsg and notice (yes, now it does work, but i want it to work better)
 - handle unhandled numerics
 - signals for everything
 - fill a QStringList with nicks in channel AND MODES on join
 - ctcp replies
 - SPLIT EVERYTHING IN MODULES!
 - mirc colors: handle them or wipe them
-- handle /me command
 - handle unhandled raws like MODE or TOPIC
 - what to do in case of used nick?
 
