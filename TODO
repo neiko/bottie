@@ -15,6 +15,7 @@ Core module
 - mirc colors: handle them or wipe them
 - handle /me command
 - handle unhandled raws like MODE or TOPIC
+- what to do in case of used nick?
 
 Lurker module
 - mode handling
