@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "lurker.h"
+#include <QDateTime>
 
 Lurker::Lurker()
 {
@@ -260,12 +261,13 @@ void Lurker::topic(QString chan,QString topic_) {
 
 void Lurker::topicTime(QString chan,QString nick,QString tstamp) {
   timestamp();
+  QDateTime realtimestamp = realtimestamp.fromTime_t(tstamp.toInt());
   out(QString("  -> Topic for "),OUT_COLORED, COLOR_CYAN);
   out(chan);
   out(QString(" was set by "),OUT_COLORED, COLOR_CYAN);
   out(nick);
   out(QString(" on "),OUT_COLORED, COLOR_CYAN);
-  out(tstamp);
+  out(realtimestamp.toString());
   out(QString("\n"));
 }
 
