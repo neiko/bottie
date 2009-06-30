@@ -52,7 +52,7 @@ void Irc::goDisconnect() {
 
 void Irc::readData() {
   indata += socket->readAll();
-  //out(indata,OUT_CLEAN); // with this enabled, bottie will output EVERY raw it gets to console
+  // qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
 
   bool taking = false;
   if(indata.right (2)!= "\r\n")
@@ -80,12 +80,6 @@ void Irc::parse(QString raw) {
 
   } else if ( matrix[0] == "ERROR" ) { // error de conexion, whichever
     emit connError(raw.right(raw.length() - 7)); //quita el "ERROR :" del principio y deja el msj limpio
-
-  } else if ( matrix[1] == "NOTICE" && matrix[2] == "IP_LOOKUP" && status == STATUS_LOGGING_IN) {
-    //Inicio de sesión
-
-    sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
-                              + server + " :" + realname);
 
   } else if ( matrix[1] == "PRIVMSG" || matrix[1] == "NOTICE" ) {
     QString nick = matrix[0].left(matrix[0].indexOf('!'));
@@ -135,11 +129,22 @@ void Irc::parse(QString raw) {
     }
   } else if ( matrix[1] == "NICK" ) {
     QString nick = matrix[0].left(matrix[0].indexOf('!'));
-    QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" JOIN") - nick.length()));
+    QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" NICK") - nick.length()));
     QString newnick = raw.right((raw.length() - 2) - raw.indexOf(" :"));
     if (newnick == ownNick)
       emit ownNickChange(newnick);
     emit nickChange(nick,mask,newnick);
+  } else if ( matrix[1] == "MODE" ) { // cambio de modo, pero no sé si es de usuario o canal.
+    if ( matrix[2].startsWith('#') ) { // c mode
+      QString nick = matrix[0].left(matrix[0].indexOf('!'));
+      QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" MODE") - nick.length()));
+      QString chan = matrix[2];
+      QString mode = raw.right((raw.length() - raw.indexOf(" #")) - chan.length() - 2);
+      mode.chop(1); // chopped! I get a blankspace at the end of the string so with this I get rid of it
+      emit modeChange(nick,mask,chan,mode);
+    }
+    else // u mode
+      emit umodeChange(matrix[0],matrix[2],raw.right((raw.length() - 2) - raw.indexOf(" :")));
   }
   bool isInt;
   int code_msg = matrix[1].toInt( &isInt );
@@ -150,7 +155,6 @@ void Irc::parse(QString raw) {
         ownNick = matrix[2];
         break;
       case 266: // fin de conexion, autojoin
-        status = STATUS_AUTOJOINING;
         //qDebug() << "Entrando a canales de autojoin: " << chans << endl;
         sendData("JOIN ",true);
         sendData(chans);
@@ -171,6 +175,9 @@ void Irc::parse(QString raw) {
 
 void Irc::connected() {
   emit gotConnection();
+  sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
+           + server + " :" + realname);
+  status = STATUS_AUTOJOINING;
 }
 
 void Irc::disconnected() {

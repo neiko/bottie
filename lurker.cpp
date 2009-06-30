@@ -24,7 +24,7 @@ Lurker::Lurker()
 {
   server = "irc.telecable.es";
   port = 6667;
-  ownNick = "*";
+  ownNick = "lurker__";
   chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra";
   ident = "nosoyunbot";
   realname = "Alejese, creo que esta claro que no soy un bot.";
@@ -51,6 +51,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(connError(QString)), this, SLOT(connError(QString)));
   connect(interface, SIGNAL(topic(QString,QString)), this, SLOT(topic(QString,QString)));
   connect(interface, SIGNAL(topicTime(QString,QString,QString)), this, SLOT(topicTime(QString,QString,QString)));
+  connect(interface, SIGNAL(umodeChange(QString,QString,QString)), this, SLOT(umodeChange(QString,QString,QString)));
+  connect(interface, SIGNAL(modeChange(QString,QString,QString,QString)), this, SLOT(modeChange(QString,QString,QString,QString)));
 
 }
 
@@ -90,7 +92,7 @@ void Lurker::out(QString mes, int type, int colour, bool notused) {
 
 
 void Lurker::gotConnection(){
-  out(QString("Conectado a ") + server + QString("\n"));
+  out(QString("Conectado a ") + server + QString("\nIniciando sesion...\n"));
 }
 
 void Lurker::gotDisconnection(){
@@ -122,9 +124,9 @@ void Lurker::join(QString nick,QString mask,QString chan) {
 void Lurker::chanmsg(QString nick,QString mask,QString chan,QString message) {
   timestamp();
   out(QString("<"),OUT_COLORED, COLOR_CYAN, true);
-  out(nick,OUT_COLORED, COLOR_WHITE);
+  out(nick,OUT_COLORED, COLOR_CYAN, true);
   out(QString("@"),OUT_COLORED, COLOR_CYAN, true);
-  out(chan,OUT_COLORED, COLOR_WHITE);
+  out(chan,OUT_COLORED, COLOR_CYAN, true);
   out(QString("> "),OUT_COLORED, COLOR_CYAN, true);
   out(message,OUT_COLORED, COLOR_WHITE);
   out(QString("\n"),OUT);
@@ -132,7 +134,7 @@ void Lurker::chanmsg(QString nick,QString mask,QString chan,QString message) {
 void Lurker::querymsg(QString nick,QString mask,QString message) {
   timestamp();
   out(QString("<"),OUT_COLORED, COLOR_CYAN, true);
-  out(nick,OUT_COLORED, COLOR_WHITE);
+  out(nick,OUT_COLORED, COLOR_CYAN, true);
   out(QString("> "),OUT_COLORED, COLOR_CYAN, true);
   out(message,OUT_COLORED, COLOR_WHITE);
   out(QString("\n"),OUT);
@@ -150,9 +152,9 @@ void Lurker::chanme(QString nick,QString mask,QString chan,QString message) {
 void Lurker::queryme(QString nick,QString mask,QString message) {
   timestamp();
   out(QString(" * "),OUT_COLORED, COLOR_CYAN, true);
-  out(nick,OUT_COLORED, COLOR_WHITE);
+  out(nick,OUT_COLORED, COLOR_CYAN, true);
   out(QString(" "),OUT_COLORED, COLOR_CYAN, true);
-  out(message,OUT_COLORED, COLOR_WHITE);
+  out(message,OUT_COLORED, COLOR_CYAN, true);
   out(QString("\n"),OUT);
 }
 void Lurker::channotice(QString nick,QString mask,QString chan,QString message) {
@@ -168,7 +170,7 @@ void Lurker::channotice(QString nick,QString mask,QString chan,QString message) 
 void Lurker::querynotice(QString nick,QString mask,QString message) {
   timestamp();
   out(QString("/"),OUT_COLORED, COLOR_CYAN, true);
-  out(nick,OUT_COLORED, COLOR_WHITE);
+  out(nick, OUT_COLORED, COLOR_CYAN, true);
   out(QString("/ "),OUT_COLORED, COLOR_CYAN, true);
   out(message,OUT_COLORED, COLOR_WHITE);
   out(QString("\n"),OUT);
@@ -262,5 +264,26 @@ void Lurker::topicTime(QString chan,QString nick,QString tstamp) {
   out(nick);
   out(QString(" on "),OUT_COLORED, COLOR_CYAN);
   out(tstamp);
+  out(QString("\n"));
+}
+
+void Lurker::umodeChange(QString setter,QString setted,QString mode) {
+  timestamp();
+  out(QString("  -> "),OUT_COLORED, COLOR_CYAN);
+  out(setter);
+  out(QString(" sets mode "),OUT_COLORED, COLOR_CYAN);
+  out(setted);
+  out(" to ",OUT_COLORED, COLOR_CYAN);
+  out(mode);
+  out(QString("\n"));
+}
+void Lurker::modeChange(QString setter,QString mask, QString chan, QString mode) {
+  timestamp();
+  out(QString("  -> "),OUT_COLORED, COLOR_CYAN);
+  out(setter);
+  out(QString(" has set channel mode "),OUT_COLORED, COLOR_CYAN);
+  out(chan);
+  out(" to ", OUT_COLORED, COLOR_CYAN);
+  out(mode);
   out(QString("\n"));
 }

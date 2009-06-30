@@ -83,4 +83,6 @@ public slots:
   void connError(QString);
   void topic(QString,QString);
   void topicTime(QString,QString,QString);
+  void umodeChange(QString,QString,QString);
+  void modeChange(QString,QString,QString,QString);
 };
