@@ -80,9 +80,15 @@ void Irc::parse(QString raw) {
   do {
     do {
       if ( raw [len] == '\003' ) { // color, veo muuucho color
-        len += 2;
+        if ( raw [len+2].isNumber() ) // número de dos dígitos
+          len += 3;
+        else
+          len += 2;
         if ( raw [len] == ',' && raw[len++].isNumber() )  // color, veo aúuuun más color
-          len += 4;
+          if ( raw [len+2].isNumber() ) // número de dos dígitos
+            len += 3;
+          else
+            len += 2;
       } else if ( raw [len] == '\002' || raw [len] == '\026' || raw [len] == '\035' ) // blablalba
         len++;
     } while ( raw [len] == '\003' || raw [len] == '\002'|| raw [len] == '\026'||
@@ -163,6 +169,19 @@ void Irc::parse(QString raw) {
       QString mode = raw.right((raw.length() - raw.indexOf(" #")) - chan.length() - 2);
       mode.chop(1); // chopped! I get a blankspace at the end of the string so with this I get rid of it
       emit modeChange(nick,mask,chan,mode);
+    }
+    else // u mode
+      emit umodeChange(matrix[0],matrix[2],raw.right((raw.length() - 2) - raw.indexOf(" :")));
+  } else if ( matrix[1] == "KICK" ) { // expulsión del canal
+    if ( matrix[2].startsWith('#') ) { // c mode
+      QString nick = matrix[0].left(matrix[0].indexOf('!'));
+      QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" KICK") - nick.length()));
+      QString chan = matrix[2];
+      QString kicked = matrix[3];
+      QString message;
+      if (raw.indexOf(" :") != -1)
+        message = raw.right((raw.length() - 2) - raw.indexOf(" :"));
+      emit kick(nick,mask,chan,kicked,message);
     }
     else // u mode
       emit umodeChange(matrix[0],matrix[2],raw.right((raw.length() - 2) - raw.indexOf(" :")));

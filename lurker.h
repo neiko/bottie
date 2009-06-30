@@ -85,4 +85,5 @@ public slots:
   void topicTime(QString,QString,QString);
   void umodeChange(QString,QString,QString);
   void modeChange(QString,QString,QString,QString);
+  void kick(QString,QString,QString,QString,QString);
 };

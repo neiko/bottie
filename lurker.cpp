@@ -25,7 +25,7 @@ Lurker::Lurker()
   server = "irc.telecable.es";
   port = 6667;
   ownNick = "lurker__";
-  chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra";
+  chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra,#ajejas";
   ident = "nosoyunbot";
   realname = "Alejese, creo que esta claro que no soy un bot.";
   myNick = ownNick; // presupondré que no cambia... :p
@@ -53,6 +53,7 @@ Lurker::Lurker()
   connect(interface, SIGNAL(topicTime(QString,QString,QString)), this, SLOT(topicTime(QString,QString,QString)));
   connect(interface, SIGNAL(umodeChange(QString,QString,QString)), this, SLOT(umodeChange(QString,QString,QString)));
   connect(interface, SIGNAL(modeChange(QString,QString,QString,QString)), this, SLOT(modeChange(QString,QString,QString,QString)));
+  connect(interface, SIGNAL(kick(QString,QString,QString,QString,QString)), this, SLOT(kick(QString,QString,QString,QString,QString)));
 
 }
 
@@ -107,17 +108,17 @@ void Lurker::PingPong(){
 
 void Lurker::join(QString nick,QString mask,QString chan) {
   timestamp();
-  out(QString("---> "),OUT_COLORED, COLOR_GREEN, true);
+  out(QString("---> "),OUT_COLORED, COLOR_GREEN);
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) // JOIN propio o ajeno???
     out(QString("I have"),OUT_COLORED, COLOR_GREEN);
   else {
-    out(nick, OUT_COLORED, COLOR_GREEN);
+    out(nick);
     out(QString(" ["));
     out(mask,OUT_COLORED, COLOR_GREEN);
     out(QString("]"));
   }
     out(QString(" joined "),OUT_COLORED, COLOR_GREEN);
-    out(chan, OUT_COLORED, COLOR_GREEN);
+    out(chan);
     out(QString("\n"));
 }
 
@@ -178,18 +179,18 @@ void Lurker::querynotice(QString nick,QString mask,QString message) {
 
 void Lurker::part(QString nick,QString mask,QString chan,QString message) {
   timestamp();
-  out(QString("<--- "),OUT_COLORED, COLOR_RED, true);
+  out("<--- ",OUT_COLORED, COLOR_CYAN);
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) // part propio o ajeno???
     out(QString("I've"),OUT_COLORED, COLOR_CYAN);
   else {
-    out(nick, OUT_COLORED, COLOR_CYAN);
-    out(QString(" ["));
+    out(nick);
+    out(" [");
     out(mask,OUT_COLORED, COLOR_CYAN);
-    out(QString("]"));
+    out("]");
   }
   out(QString(" parted "),OUT_COLORED, COLOR_CYAN);
-  out(chan, OUT_COLORED, COLOR_CYAN);
-  if (QString::compare(message, "")) {
+  out(chan);
+  if (!message.isEmpty()) {
     out(QString(" ["));
     out(message, OUT_COLORED, COLOR_CYAN);
     out(QString("]"));
@@ -199,17 +200,18 @@ void Lurker::part(QString nick,QString mask,QString chan,QString message) {
 
 void Lurker::quit(QString nick,QString mask,QString message) {
   timestamp();
-  out(QString("<--- "),OUT_COLORED, COLOR_RED, true);
-  out(nick, OUT_COLORED, COLOR_CYAN);
-  out(QString(" ["));
+  out("<--- ",OUT_COLORED, COLOR_CYAN);
+  out(nick);
+  out(" [");
   out(mask,OUT_COLORED, COLOR_CYAN);
-  out(QString("]"));
-  out(QString(" has quit "),OUT_COLORED, COLOR_CYAN);
-  if (QString::compare(message, "")) {
-    out(QString("["));
+  out("]");
+  out(" has quit ",OUT_COLORED, COLOR_CYAN);
+  if (!message.isEmpty()) {
+    out("[");
     out(message, OUT_COLORED, COLOR_CYAN);
-    out(QString("]\n"));
+    out("]");
   }
+  out("\n");
 }
 
 void Lurker::ownNickChange(QString newnick){
@@ -226,18 +228,18 @@ void Lurker::timestamp(){
 
 void Lurker::nickChange(QString nick,QString mask,QString newnick) {
   timestamp();
-  out(QString("  -> "),OUT_COLORED, COLOR_YELLOW);
+  out("  -> ", OUT_COLORED, COLOR_YELLOW);
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) // JOIN propio o ajeno???
-    out(QString("I have"),OUT_COLORED, COLOR_YELLOW);
+    out("I have", OUT_COLORED, COLOR_YELLOW);
   else {
-    out(nick, OUT_COLORED, COLOR_YELLOW);
-    out(QString(" ["));
+    out(nick);
+    out(" [");
     out(mask,OUT_COLORED, COLOR_YELLOW);
-    out(QString("]"));
+    out("]");
   }
-    out(QString(" changed nick to "),OUT_COLORED, COLOR_YELLOW);
-    out(newnick, OUT_COLORED, COLOR_YELLOW);
-    out(QString("\n"));
+    out(" changed nick to ",OUT_COLORED, COLOR_YELLOW);
+    out(newnick);
+    out("\n");
 }
 
 void Lurker::connError(QString errdesc) {
@@ -286,4 +288,22 @@ void Lurker::modeChange(QString setter,QString mask, QString chan, QString mode)
   out(" to ", OUT_COLORED, COLOR_CYAN);
   out(mode);
   out(QString("\n"));
+}
+void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QString message) {
+  timestamp();
+  out(QString("<--- "),OUT_COLORED, COLOR_RED, true);
+  out(nick);
+  out(" [");
+  out(mask,OUT_COLORED, COLOR_CYAN);
+  out("]");
+  out(" has kicked ",OUT_COLORED, COLOR_CYAN);
+  out(kicked);
+  out(" from ", OUT_COLORED, COLOR_CYAN);
+  out(chan);
+  if ( !message.isEmpty() ) {
+    out(" [", OUT_COLORED, COLOR_CYAN);
+    out(message);
+    out("]", OUT_COLORED, COLOR_CYAN);
+  }
+  out("\n");
 }
