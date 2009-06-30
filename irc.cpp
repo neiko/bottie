@@ -64,8 +64,10 @@ void Irc::readData() {
   {indata = list.back();
    list.removeLast();}
 
-  foreach(QString pendingString,list)
-    parse(QString::fromUtf8(qPrintable(pendingString)));
+  foreach(QString pendingString,list){
+    //parse(QString::fromUtf8(qPrintable(pendingString)));
+    qDebug() << pendingString;
+    parse(pendingString);}
 
   indata.clear();
 }
@@ -80,15 +82,12 @@ void Irc::parse(QString raw) {
   do {
     do {
       if ( raw [len] == '\003' ) { // color, veo muuucho color
-        if ( raw [len+2].isNumber() ) // número de dos dígitos
-          len += 3;
-        else
+        len += 2;
+        if ( raw [len].isNumber() ) len++;
+        if ( raw [len] == ',' && raw [len+1].isDigit() ) { // color, veo aúuuun más color
           len += 2;
-        if ( raw [len] == ',' && raw[len++].isNumber() )  // color, veo aúuuun más color
-          if ( raw [len+2].isNumber() ) // número de dos dígitos
-            len += 3;
-          else
-            len += 2;
+          if ( raw [len].isNumber() ) len++;
+        }
       } else if ( raw [len] == '\002' || raw [len] == '\026' || raw [len] == '\035' ) // blablalba
         len++;
     } while ( raw [len] == '\003' || raw [len] == '\002'|| raw [len] == '\026'||
