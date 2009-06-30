@@ -83,20 +83,9 @@ void Irc::parse(QString raw) {
 
   } else if ( matrix[1] == "NOTICE" && matrix[2] == "IP_LOOKUP" && status == STATUS_LOGGING_IN) {
     //Inicio de sesión
-    //out(QString("Iniciando sesion...\n"),OUT);
 
-    // Menuda cerdada esto de aquí abajo, ¿no?
-    QString tempraw = QString("NICK ");
-    tempraw.append(ownNick);
-    tempraw.append("\nUSER ");
-    tempraw.append(ident);
-    tempraw.append(" ");
-    tempraw.append(ownNick);
-    tempraw.append(" ");
-    tempraw.append(server);
-    tempraw.append(" :");
-    tempraw.append(realname);
-    sendData(tempraw);
+    sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
+                              + server + " :" + realname);
 
   } else if ( matrix[1] == "PRIVMSG" || matrix[1] == "NOTICE" ) {
     QString nick = matrix[0].left(matrix[0].indexOf('!'));
