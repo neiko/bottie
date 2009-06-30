@@ -64,10 +64,8 @@ void Irc::readData() {
   {indata = list.back();
    list.removeLast();}
 
-  foreach(QString pendingString,list){
-    //parse(QString::fromUtf8(qPrintable(pendingString)));
-    qDebug() << pendingString;
-    parse(pendingString);}
+  foreach(QString pendingString,list)
+    parse(QString::fromUtf8(qPrintable(pendingString)));
 
   indata.clear();
 }
