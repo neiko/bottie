@@ -21,6 +21,8 @@
 #include "irc.h"
 #include <stdio.h>
 
+#define COLOR_WIPE
+
 Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString iident, QString irealname)
 {
 
@@ -71,8 +73,27 @@ void Irc::readData() {
 void Irc::parse(QString raw) {
   if (raw.startsWith(':'))
     raw = raw.right(raw.length() - 1);
-  QStringList matrix = raw.split(' ');
 
+#ifdef COLOR_WIPE
+  QString xraw; int len = 0; int olen = raw.length();
+  // dirty but useful color removal code
+  do {
+    do {
+      if ( raw [len] == '\003' ) { // color, veo muuucho color
+        len += 2;
+        if ( raw [len] == ',' && raw[len++].isNumber() )  // color, veo aúuuun más color
+          len += 4;
+      } else if ( raw [len] == '\002' || raw [len] == '\026' || raw [len] == '\035' ) // blablalba
+        len++;
+    } while ( raw [len] == '\003' || raw [len] == '\002'|| raw [len] == '\026'||
+              raw [len] == '\035' ); // esto es una guarrada pero evita varios control codes consecutivos
+      xraw.append(raw[len]);
+      len++;
+  } while( len < olen );
+  raw = xraw;
+#endif
+
+  QStringList matrix = raw.split(' ');
   if( matrix[0] == "PING" ) { // Recibido ping, pongoneamos.
     indata[1] = 'O'; // xD
     sendData(indata);
