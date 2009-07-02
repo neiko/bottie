@@ -25,7 +25,7 @@ Lurker::Lurker()
 {
   server = "irc.telecable.es";
   port = 6667;
-  ownNick = "lurker__";
+  ownNick = "chan";
   chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra,#ajejas";
   ident = "nosoyunbot";
   realname = "Alejese, creo que esta claro que no soy un bot.";
@@ -55,6 +55,7 @@ Lurker::Lurker()
   connect(interface, SIGNAL(umodeChange(QString,QString,QString)), this, SLOT(umodeChange(QString,QString,QString)));
   connect(interface, SIGNAL(modeChange(QString,QString,QString,QString)), this, SLOT(modeChange(QString,QString,QString,QString)));
   connect(interface, SIGNAL(kick(QString,QString,QString,QString,QString)), this, SLOT(kick(QString,QString,QString,QString,QString)));
+  connect(interface, SIGNAL(usedNick(QString,QString)), this, SLOT(usedNick(QString,QString)));
 
 }
 
@@ -84,13 +85,13 @@ void Lurker::out(QString mes, int type) {
 
 void Lurker::out(QString mes, int type, int colour) {
   QTextStream cout(stdout, QIODevice::WriteOnly);
-  if (type == OUT_COLORED)
+  if (type == OUT_COLORED) {
 #ifdef Q_OS_WIN
     cout << mes;
 #else
     cout << "\033[3" << colour << ";2m" << mes << "\033[0m";
 #endif
-  else
+  } else
     qDebug() << "out() with wrong type!" << endl;
 }
 
@@ -102,23 +103,28 @@ void Lurker::out(QString mes, int type, int colour, bool notused) {
 #ifdef Q_OS_WIN
     cout << mes;
 #else
-    cout << "\033[" << colour << ";1m" << mes << "\033[0m";
+    cout << "\033[3" << colour << ";1m" << mes << "\033[0m";
 #endif
   else
     qDebug() << "out() with wrong type!" << endl;
 }
 
 void Lurker::gotConnection(){
-  out("Conectado a " + server + "\nIniciando sesion...\n");
+  timestamp();
+  out("Conectado a " + server + "\n");
+  timestamp();
+  out("Iniciando sesion...\n");
 }
 
 void Lurker::gotDisconnection(){
-  out("ATENCION: Desconectado de " + server + "\n");
+  timestamp();
+  out("ATENCION: Desconectado de " + server + "\n", OUT_COLORED, COLOR_RED, true);
   //fatal
   exit(1);
 }
 
 void Lurker::PingPong(){
+  timestamp();
   out("Ping? PONG!\n",OUT);
 }
 
@@ -141,9 +147,9 @@ void Lurker::join(QString nick,QString mask,QString chan) {
 void Lurker::chanmsg(QString nick,QString mask,QString chan,QString message) {
   timestamp();
   out("<",OUT_COLORED, COLOR_CYAN, true);
-  out(nick,OUT_COLORED, COLOR_CYAN, true);
+  out(nick, OUT_COLORED, COLOR_WHITE, true);
   out("@",OUT_COLORED, COLOR_CYAN, true);
-  out(chan,OUT_COLORED, COLOR_CYAN, true);
+  out(chan,OUT_COLORED, COLOR_WHITE, true);
   out("> ",OUT_COLORED, COLOR_CYAN, true);
   out(message,OUT_COLORED, COLOR_WHITE);
   out("\n",OUT);
@@ -265,7 +271,7 @@ void Lurker::nickChange(QString nick,QString mask,QString newnick) {
 
 void Lurker::connError(QString errdesc) {
   timestamp();
-  out(errdesc + "\n", OUT_COLORED, 31, true);
+  out(errdesc + "\n", OUT_COLORED, COLOR_RED, true);
   // Sad but true, a connection error is FATAL for us.
   exit(1);
 }
@@ -330,4 +336,13 @@ void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QStr
     out("]", OUT_COLORED, COLOR_CYAN);
   }
   out("\n");
+}
+
+void Lurker::usedNick(QString oldNick, QString newNick) {
+  timestamp();
+  out("> El nick ", OUT_COLORED, 1, true);
+  out(oldNick);
+  out(" ya esta en uso. Intentando con ", OUT_COLORED, COLOR_RED, true);
+  out(newNick);
+  out("...\n", OUT_COLORED, COLOR_RED, true);
 }

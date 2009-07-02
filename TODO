@@ -6,7 +6,6 @@ Core module
 - ctcp replies
 - SPLIT EVERYTHING IN MODULES!
 - handle unhandled raws like MODE or TOPIC
-- what to do in case of used nick?
 
 Lurker module
 - enhance mode handling

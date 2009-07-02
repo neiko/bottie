@@ -54,7 +54,7 @@ void Irc::goDisconnect() {
 
 void Irc::readData() {
   indata += socket->readAll();
-  // qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
+  //qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
 
   bool taking = false;
   if(indata.right (2)!= "\r\n")
@@ -203,6 +203,9 @@ void Irc::parse(QString raw) {
       case 333: //topic timestamp
         emit topicTime(matrix[3],matrix[4],matrix[5]);
         break;
+      case 433: // nick en uso!
+        getNewRandomNick();
+        break;
       default:
         //qDebug() << "Numeric NO MANEJADO!" << matrix[1] << endl;
         break;
@@ -230,4 +233,17 @@ void Irc::sendData(QString outdata) {
 void Irc::sendData(QString outdata, bool noTrail) {
   if (noTrail == true)
     socket->write( outdata.toUtf8() );
+}
+
+void Irc::getNewRandomNick() {
+  QString ran, newNick = ownNick;
+  int i;
+  do {
+    i = rand();
+  } while ( i < 99 || i > 999 );
+  ran.setNum(i);
+  newNick.append(ran);
+  emit usedNick ( ownNick, newNick );
+  sendData("NICK " + newNick);
+  emit ownNickChange ( newNick );
 }

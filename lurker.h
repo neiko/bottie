@@ -86,4 +86,5 @@ public slots:
   void umodeChange(QString,QString,QString);
   void modeChange(QString,QString,QString,QString);
   void kick(QString,QString,QString,QString,QString);
+  void usedNick(QString,QString);
 };

@@ -44,6 +44,7 @@ public:
 
 private:
   void parse(QString);
+  void getNewRandomNick();
 
 signals:
   void PingPong();
@@ -66,6 +67,7 @@ signals:
   void umodeChange(QString,QString,QString);
   void modeChange(QString,QString,QString,QString);
   void kick(QString,QString,QString,QString,QString);
+  void usedNick(QString,QString);
 
 public slots:
 
