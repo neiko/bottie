@@ -61,7 +61,11 @@ Lurker::Lurker()
 
 void Lurker::out(QString mes) { // no se especificó tipo así que presupondré que será OUT y así ahorro teclado
   QTextStream cout(stdout, QIODevice::WriteOnly);
+#ifdef Q_OS_WIN
+  cout << mes;
+#else
   cout << "\033[15;1m" << mes << "\033[0m";
+#endif
 }
 
 void Lurker::out(QString mes, int type) {
@@ -69,7 +73,11 @@ void Lurker::out(QString mes, int type) {
   if (type == OUT_CLEAN)
     cout << mes;
   else if (type == OUT)
+#ifdef Q_OS_WIN
+    cout << mes;
+#else
     cout << "\033[15;1m" << mes << "\033[0m";
+#endif
   else
     qDebug() << "out() with wrong type!" << endl;
 }
@@ -77,7 +85,11 @@ void Lurker::out(QString mes, int type) {
 void Lurker::out(QString mes, int type, int colour) {
   QTextStream cout(stdout, QIODevice::WriteOnly);
   if (type == OUT_COLORED)
+#ifdef Q_OS_WIN
+    cout << mes;
+#else
     cout << "\033[3" << colour << ";2m" << mes << "\033[0m";
+#endif
   else
     qDebug() << "out() with wrong type!" << endl;
 }
@@ -87,7 +99,11 @@ void Lurker::out(QString mes, int type, int colour, bool notused) {
   // queremos negrita. viva la sobrecarga de operadores :D
   QTextStream cout(stdout, QIODevice::WriteOnly);
   if (type == OUT_COLORED)
-    cout << "\033[" << colour << ";1m" << mes << "\033[0m";
+#ifdef Q_OS_WIN
+    cout << mes;
+#else
+  cout << "\033[" << colour << ";1m" << mes << "\033[0m";
+#endif
   else
     qDebug() << "out() with wrong type!" << endl;
 }
