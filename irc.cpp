@@ -164,7 +164,6 @@ void Irc::parse(QString raw) {
       QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" MODE") - nick.length()));
       QString chan = matrix[2];
       QString mode = raw.right((raw.length() - raw.indexOf(" #")) - chan.length() - 2);
-      mode.chop(1); // chopped! I get a blankspace at the end of the string so with this I get rid of it
       emit modeChange(nick,mask,chan,mode);
     }
     else // u mode
@@ -192,7 +191,6 @@ void Irc::parse(QString raw) {
         ownNick = matrix[2];
         break;
       case 266: // fin de conexion, autojoin
-        //qDebug() << "Entrando a canales de autojoin: " << chans << endl;
         sendData("JOIN ",true);
         sendData(chans);
         status = STATUS_IDLE;

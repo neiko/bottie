@@ -6,6 +6,7 @@ Core module
 - ctcp replies
 - SPLIT EVERYTHING IN MODULES!
 - handle unhandled raws like MODE or TOPIC
+- signals (^C) handling
 
 Lurker module
 - enhance mode handling

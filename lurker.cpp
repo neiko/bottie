@@ -25,7 +25,7 @@ Lurker::Lurker()
 {
   server = "irc.telecable.es";
   port = 6667;
-  ownNick = "chan";
+  ownNick = "lurker__";
   chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra,#ajejas";
   ident = "nosoyunbot";
   realname = "Alejese, creo que esta claro que no soy un bot.";
@@ -85,13 +85,13 @@ void Lurker::out(QString mes, int type) {
 
 void Lurker::out(QString mes, int type, int colour) {
   QTextStream cout(stdout, QIODevice::WriteOnly);
-  if (type == OUT_COLORED) {
+  if (type == OUT_COLORED)
 #ifdef Q_OS_WIN
     cout << mes;
 #else
     cout << "\033[3" << colour << ";2m" << mes << "\033[0m";
 #endif
-  } else
+  else
     qDebug() << "out() with wrong type!" << endl;
 }
 
