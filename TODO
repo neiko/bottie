@@ -5,7 +5,6 @@ Core module
 - fill a QStringList with nicks in channel AND MODES on join
 - ctcp replies
 - SPLIT EVERYTHING IN MODULES!
-- mirc colors: enhance wiping, it still shows some numbers
 - handle unhandled raws like MODE or TOPIC
 - what to do in case of used nick?
 
@@ -15,3 +14,4 @@ Lurker module
 - show chanmode before nick on chanmsg
 - show common channels on querymsg
 - handle server, chans, and everything configurable using QConfig (because hardcoding sucks)
+- port linux console colors to windows
