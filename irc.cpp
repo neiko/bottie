@@ -112,13 +112,19 @@ void Irc::parse(QString raw) {
 
     if ( matrix[1] == "PRIVMSG" ) {
       if ( matrix[2].startsWith("#") ) { // mensaje de canal
-        if ( message.startsWith("ACTION ") ) // /me
-          emit chanme ( nick, mask, matrix[2], message.right((message.length() - 8)) );
+        if ( message.startsWith("\001") ) // /ctcp
+          if ( message.startsWith("\001ACTION ")) // me
+            emit chanme ( nick, mask, matrix[2], message.right((message.length() - 8)) );
+          else
+            emit chanctcp ( nick, mask, matrix[2], message.right((message.length() - 1)) );
         else
           emit chanmsg ( nick, mask, matrix[2], message );
       } else { // mensaje en privado
-        if ( message.startsWith("ACTION ") ) // /me
-          emit queryme ( nick, mask, message.right((message.length() - 8)) );
+        if ( message.startsWith("\001") ) // /me
+          if ( message.startsWith("\001ACTION ")) // me
+            emit queryme ( nick, mask, message.right((message.length() - 8)) );
+          else
+            emit queryctcp ( nick, mask, message.right((message.length() - 1)) );
         else
           emit querymsg ( nick, mask, message );
       }
@@ -213,8 +219,10 @@ void Irc::parse(QString raw) {
 
 void Irc::connected() {
   emit gotConnection();
-  sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
-           + server + " :" + realname);
+  QString tmp = "NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
+           + server + " :" + realname;
+  //tmp.append(ownNick);
+  sendData(tmp);
   status = STATUS_AUTOJOINING;
 }
 
@@ -226,6 +234,10 @@ void Irc::displayError(QAbstractSocket::SocketError e) { /* TODO */ }
 
 void Irc::sendData(QString outdata) {
   socket->write( outdata.toUtf8() + "\r\n" );
+}
+void Irc::sendRaw(QString *outdata) {
+  //qDebug() << outdata << "en" << &outdata << "pero" << outdata->toAscii() << endl;
+  socket->write( "PING\r\n" );
 }
 
 void Irc::sendData(QString outdata, bool noTrail) {
@@ -242,6 +254,7 @@ void Irc::getNewRandomNick() {
   ran.setNum(i);
   newNick.append(ran);
   emit usedNick ( ownNick, newNick );
-  sendData("NICK " + newNick);
+  sendData("NICK ",true);
+  sendData(newNick);
   emit ownNickChange ( newNick );
 }

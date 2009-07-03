@@ -23,7 +23,7 @@
 
 Lurker::Lurker()
 {
-  server = "irc.telecable.es";
+  server = "irc.mundo-r.com";
   port = 6667;
   ownNick = "lurker__";
   chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra,#ajejas";
@@ -42,6 +42,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(join(QString,QString,QString)), this, SLOT(join(QString,QString,QString)));
   connect(interface, SIGNAL(chanmsg(QString,QString,QString,QString)), this, SLOT(chanmsg(QString,QString,QString,QString)));
   connect(interface, SIGNAL(querymsg(QString,QString,QString)), this, SLOT(querymsg(QString,QString,QString)));
+  connect(interface, SIGNAL(chanctcp(QString,QString,QString,QString)), this, SLOT(chanctcp(QString,QString,QString,QString)));
+  connect(interface, SIGNAL(queryctcp(QString,QString,QString)), this, SLOT(queryctcp(QString,QString,QString)));
   connect(interface, SIGNAL(chanme(QString,QString,QString,QString)), this, SLOT(chanme(QString,QString,QString,QString)));
   connect(interface, SIGNAL(queryme(QString,QString,QString)), this, SLOT(queryme(QString,QString,QString)));
   connect(interface, SIGNAL(channotice(QString,QString,QString,QString)), this, SLOT(channotice(QString,QString,QString,QString)));
@@ -57,6 +59,9 @@ Lurker::Lurker()
   connect(interface, SIGNAL(kick(QString,QString,QString,QString,QString)), this, SLOT(kick(QString,QString,QString,QString,QString)));
   connect(interface, SIGNAL(usedNick(QString,QString)), this, SLOT(usedNick(QString,QString)));
 
+
+  connect(this, SIGNAL(sendData(QString)), interface, SLOT(sendData(QString)));
+  connect(this, SIGNAL(sendData(QString,bool)), interface, SLOT(sendData(QString,bool)));
 }
 
 
@@ -345,4 +350,32 @@ void Lurker::usedNick(QString oldNick, QString newNick) {
   out(" ya esta en uso. Intentando con ", OUT_COLORED, COLOR_RED, true);
   out(newNick);
   out("...\n", OUT_COLORED, COLOR_RED, true);
+}
+
+void Lurker::chanctcp(QString nick,QString mask,QString chan,QString ctcp) {
+  timestamp();
+  out(" > Se ha recibido un CTCP ",OUT_COLORED, COLOR_CYAN, true);
+  out(ctcp, OUT_COLORED, COLOR_WHITE, true);
+  out(" de ", OUT_COLORED, COLOR_CYAN, true);
+  out(nick, OUT_COLORED, COLOR_WHITE, true);
+  out(" [");
+  out(mask, OUT_COLORED, COLOR_WHITE, true);
+  out("]");
+  out(" a ", OUT_COLORED, COLOR_CYAN, true);
+  out(chan, OUT_COLORED, COLOR_WHITE, true);
+  out("\n");
+}
+
+void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
+  timestamp();
+  out(" > Se ha recibido un CTCP ",OUT_COLORED, COLOR_CYAN, true);
+  out(ctcp, OUT_COLORED, COLOR_WHITE, true);
+  out(" de ", OUT_COLORED, COLOR_CYAN, true);
+  out(nick, OUT_COLORED, COLOR_WHITE, true);
+  out(" [");
+  out(mask, OUT_COLORED, COLOR_WHITE, true);
+  out("]\n");
+
+  if (ctcp.startsWith("VERSION"))
+    emit sendData("NOTICE " + nick + " :\001VERSION Bottie");
 }

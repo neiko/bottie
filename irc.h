@@ -38,9 +38,9 @@ Q_OBJECT
 public:
   Irc(QString,int,QString,QString,QString,QString);
   void goDisconnect();
-  void sendData(QString);
-  void sendData(QString, bool);
   void goConnect();
+  void sendRaw(QString *outdata);
+  void pongo();
 
 private:
   void parse(QString);
@@ -56,6 +56,8 @@ signals:
   void querymsg(QString,QString,QString);
   void chanme(QString,QString,QString,QString);
   void queryme(QString,QString,QString);
+  void chanctcp(QString,QString,QString,QString);
+  void queryctcp(QString,QString,QString);
   void channotice(QString,QString,QString,QString);
   void querynotice(QString,QString,QString);
   void part(QString,QString,QString,QString);
@@ -70,12 +72,17 @@ signals:
   void usedNick(QString,QString);
 
 public slots:
+//  void sendRaw(QString);
 
 private slots:
   void readData();
   void connected();
   void disconnected();
   void displayError(QAbstractSocket::SocketError);
+
+public slots:
+  void sendData(QString);
+  void sendData(QString, bool);
 
 private:
   QTcpSocket*socket;
@@ -87,6 +94,7 @@ private:
   QString ident;
   QString ownNick;
   QString realname;
+  QByteArray jojo;
 };
 
 #endif // IRC_H

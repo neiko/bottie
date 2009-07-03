@@ -3,9 +3,8 @@ Core module
 - handle unhandled numerics
 - signals for everything
 - fill a QStringList with nicks in channel AND MODES on join
-- ctcp replies
 - SPLIT EVERYTHING IN MODULES!
-- handle unhandled raws like MODE or TOPIC
+- handle unhandled raws
 - signals (^C) handling
 
 Lurker module

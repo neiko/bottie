@@ -64,6 +64,8 @@ private:
   void timestamp();
 
 signals:
+  void sendData(QString);
+  void sendData(QString, bool);
 
 public slots:
   void gotConnection();
@@ -75,6 +77,8 @@ public slots:
   void querymsg(QString,QString,QString);
   void chanme(QString,QString,QString,QString);
   void queryme(QString,QString,QString);
+  void chanctcp(QString,QString,QString,QString);
+  void queryctcp(QString,QString,QString);
   void channotice(QString,QString,QString,QString);
   void querynotice(QString,QString,QString);
   void part(QString,QString,QString,QString);
