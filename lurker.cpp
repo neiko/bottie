@@ -335,18 +335,18 @@ void Lurker::modeChange(QString setter,QString mask, QString chan, QString mode)
 void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QString message) {
   timestamp();
   out("<--- ", OUT_COLORED, COLOR_RED, true);
+  out(kicked);
+  out(" was kicked from ", OUT_COLORED, COLOR_CYAN);
+  out(chan);
+  out(" by ", OUT_COLORED, COLOR_CYAN);
   out(nick);
   out(" [");
   out(mask, OUT_COLORED, COLOR_CYAN);
   out("]");
-  out(" has kicked ", OUT_COLORED, COLOR_CYAN);
-  out(kicked);
-  out(" from ", OUT_COLORED, COLOR_CYAN);
-  out(chan);
   if ( !message.isEmpty() ) {
-    out(" [", OUT_COLORED, COLOR_CYAN);
-    out(message);
-    out("]", OUT_COLORED, COLOR_CYAN);
+    out(" [");
+    out(message, OUT_COLORED, COLOR_CYAN);
+    out("]");
   }
   out("\n");
 }
@@ -386,4 +386,12 @@ void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
 
   if (ctcp.startsWith("VERSION"))
     emit sendData("NOTICE " + nick + " :\001VERSION Bottie");
+
+  /* Con esto activado, el bot responde a CTCP PINGs. La razón por
+     la que está desactivado es simple: no hay control de saturación,
+     por lo que entre 2 o más personas, pueden tirar el bot.
+
+  if (ctcp.startsWith("PING"))
+    emit sendData("NOTICE " + nick + " :\001PING"); */
+
 }
