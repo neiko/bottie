@@ -231,6 +231,7 @@ void Irc::disconnected() {
 void Irc::displayError(QAbstractSocket::SocketError e) { /* TODO */ }
 
 void Irc::sendData(QString outdata) {
+  // qDebug() << outdata << endl; // with this enabled, debugging of output raws.
   socket->write( outdata.toUtf8() + "\r\n" );
 }
 
@@ -242,9 +243,7 @@ void Irc::sendData(QString outdata, bool noTrail) {
 void Irc::getNewRandomNick() {
   QString ran, newNick = ownNick;
   int i;
-  do {
-    i = rand();
-  } while ( i < 99 || i > 999 );
+  do i = rand(); while ( i < 99 || i > 999 );
   ran.setNum(i);
   newNick.append(ran);
   emit usedNick ( ownNick, newNick );

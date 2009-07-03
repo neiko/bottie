@@ -25,6 +25,7 @@
 
 #include <QtCore>
 #include <QString>
+#include <QSettings>
 #include "irc.h"
 
 #define OUT 0
@@ -49,6 +50,7 @@ public:
 
 private:
   Irc *interface;
+  QSettings *conf;
   QString server;
   int port;
   int status;

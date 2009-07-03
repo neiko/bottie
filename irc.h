@@ -85,7 +85,7 @@ public slots:
   void sendData(QString, bool);
 
 private:
-  QTcpSocket*socket;
+  QTcpSocket *socket;
   QString server;
   int port;
   int status;
@@ -94,7 +94,6 @@ private:
   QString ident;
   QString ownNick;
   QString realname;
-  QByteArray jojo;
 };
 
 #endif // IRC_H

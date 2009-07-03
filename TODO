@@ -12,5 +12,5 @@ Lurker module
 - o/c, nicklist on join
 - show chanmode before nick on chanmsg
 - show common channels on querymsg
-- handle server, chans, and everything configurable using QConfig (because hardcoding sucks)
 - port linux console colors to windows
+- logging to files (yay!)

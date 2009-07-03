@@ -23,12 +23,20 @@
 
 Lurker::Lurker()
 {
-  server = "irc.mundo-r.com";
-  port = 6667;
-  ownNick = "lurker__";
-  chans = "#irc-hispano,#barcelona,#madrid,#mas_de_30,#mas_de_40,#mazmorra,#ajejas";
-  ident = "nosoyunbot";
-  realname = "Alejese, creo que esta claro que no soy un bot.";
+  conf = new QSettings("config.ini", QSettings::IniFormat, this);
+
+  if (!conf) {
+    qDebug() << "Could not open/find config.ini. Exiting." << endl;
+    exit(1);
+  }
+
+  server = conf->value("server/server").toString();
+  port = conf->value("server/port").toInt();
+  chans = conf->value("server/autojoin").toString();
+
+  ownNick = conf->value("identity/nick").toString();
+  ident = conf->value("identity/ident").toString();
+  realname = conf->value("identity/realname").toString();
   myNick = ownNick; // presupondré que no cambia... :p
 
   Irc *interface = new Irc(server,port,ownNick,chans,ident,realname);
