@@ -219,10 +219,8 @@ void Irc::parse(QString raw) {
 
 void Irc::connected() {
   emit gotConnection();
-  QString tmp = "NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " "
-           + server + " :" + realname;
-  //tmp.append(ownNick);
-  sendData(tmp);
+  sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " " + \
+           server + " :" + realname);
   status = STATUS_AUTOJOINING;
 }
 
@@ -234,10 +232,6 @@ void Irc::displayError(QAbstractSocket::SocketError e) { /* TODO */ }
 
 void Irc::sendData(QString outdata) {
   socket->write( outdata.toUtf8() + "\r\n" );
-}
-void Irc::sendRaw(QString *outdata) {
-  //qDebug() << outdata << "en" << &outdata << "pero" << outdata->toAscii() << endl;
-  socket->write( "PING\r\n" );
 }
 
 void Irc::sendData(QString outdata, bool noTrail) {

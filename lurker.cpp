@@ -116,14 +116,14 @@ void Lurker::out(QString mes, int type, int colour, bool notused) {
 
 void Lurker::gotConnection(){
   timestamp();
-  out("Conectado a " + server + "\n");
+  out("Connected to " + server + "\n");
   timestamp();
-  out("Iniciando sesion...\n");
+  out("Signing in...\n");
 }
 
 void Lurker::gotDisconnection(){
   timestamp();
-  out("ATENCION: Desconectado de " + server + "\n", OUT_COLORED, COLOR_RED, true);
+  out("WARNING: Disconnected from " + server + "\n", OUT_COLORED, COLOR_RED, true);
   //fatal
   exit(1);
 }
@@ -345,32 +345,32 @@ void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QStr
 
 void Lurker::usedNick(QString oldNick, QString newNick) {
   timestamp();
-  out("> El nick ", OUT_COLORED, 1, true);
+  out("> Nick ", OUT_COLORED, 1, true);
   out(oldNick);
-  out(" ya esta en uso. Intentando con ", OUT_COLORED, COLOR_RED, true);
+  out(" is being used. Trying ", OUT_COLORED, COLOR_RED, true);
   out(newNick);
   out("...\n", OUT_COLORED, COLOR_RED, true);
 }
 
 void Lurker::chanctcp(QString nick,QString mask,QString chan,QString ctcp) {
   timestamp();
-  out(" > Se ha recibido un CTCP ",OUT_COLORED, COLOR_CYAN, true);
+  out(" > CTCP ",OUT_COLORED, COLOR_CYAN, true);
   out(ctcp, OUT_COLORED, COLOR_WHITE, true);
-  out(" de ", OUT_COLORED, COLOR_CYAN, true);
+  out(" requested from ", OUT_COLORED, COLOR_CYAN, true);
   out(nick, OUT_COLORED, COLOR_WHITE, true);
   out(" [");
   out(mask, OUT_COLORED, COLOR_WHITE, true);
   out("]");
-  out(" a ", OUT_COLORED, COLOR_CYAN, true);
+  out(" to ", OUT_COLORED, COLOR_CYAN, true);
   out(chan, OUT_COLORED, COLOR_WHITE, true);
   out("\n");
 }
 
 void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
   timestamp();
-  out(" > Se ha recibido un CTCP ",OUT_COLORED, COLOR_CYAN, true);
+  out(" > CTCP ",OUT_COLORED, COLOR_CYAN, true);
   out(ctcp, OUT_COLORED, COLOR_WHITE, true);
-  out(" de ", OUT_COLORED, COLOR_CYAN, true);
+  out(" requested from ", OUT_COLORED, COLOR_CYAN, true);
   out(nick, OUT_COLORED, COLOR_WHITE, true);
   out(" [");
   out(mask, OUT_COLORED, COLOR_WHITE, true);
