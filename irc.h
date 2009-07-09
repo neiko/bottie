@@ -36,7 +36,7 @@ class Irc : public QObject
 Q_OBJECT
 
 public:
-  Irc(QString,int,QString,QString,QString,QString);
+  Irc(QString,int,QString,QString,QString,QString,QString);
   void goDisconnect();
   void goConnect();
   void sendRaw(QString *outdata);
@@ -90,6 +90,7 @@ private:
   int port;
   int status;
   QString indata;
+  QString passwd;
   QString chans;
   QString ident;
   QString ownNick;

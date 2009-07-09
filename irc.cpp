@@ -23,7 +23,7 @@
 
 #define COLOR_WIPE
 
-Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString iident, QString irealname)
+Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString iident, QString irealname, QString ipasswd)
 {
 
   server = iserver;
@@ -32,6 +32,7 @@ Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString i
   chans = ichans;
   ident = iident;
   realname = irealname;
+  passwd = ipasswd;
 
   status = STATUS_WARMING_UP;
 
@@ -219,8 +220,11 @@ void Irc::parse(QString raw) {
 
 void Irc::connected() {
   emit gotConnection();
-  sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " " + \
-           server + " :" + realname);
+  if(!passwd.isEmpty())
+    sendData("PASS :" + passwd, true);
+  else
+    sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " " + \
+         server + " :" + realname);
   status = STATUS_AUTOJOINING;
 }
 

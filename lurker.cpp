@@ -32,6 +32,7 @@ Lurker::Lurker()
 
   server = conf->value("server/server").toString();
   port = conf->value("server/port").toInt();
+  passwd = conf->value("server/password").toString(); // this passwd is for the SERVER
   chans = conf->value("server/autojoin").toString();
 
   ownNick = conf->value("identity/nick").toString();
@@ -39,7 +40,7 @@ Lurker::Lurker()
   realname = conf->value("identity/realname").toString();
   myNick = ownNick; // presupondré que no cambia... :p
 
-  Irc *interface = new Irc(server,port,ownNick,chans,ident,realname);
+  Irc *interface = new Irc(server,port,ownNick,chans,ident,realname,passwd);
 
   interface->goConnect();
 
@@ -384,12 +385,12 @@ void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
   out(mask, OUT_COLORED, COLOR_WHITE, true);
   out("]\n");
 
-  if (ctcp.startsWith("VERSION"))
-    emit sendData("NOTICE " + nick + " :\001VERSION Bottie");
-
-  /* Con esto activado, el bot responde a CTCP PINGs. La razón por
+/* Con esto activado, el bot responde a CTCPs. La razón por
      la que está desactivado es simple: no hay control de saturación,
      por lo que entre 2 o más personas, pueden tirar el bot.
+
+  if (ctcp.startsWith("VERSION"))
+    emit sendData("NOTICE " + nick + " :\001VERSION Bottie");
 
   if (ctcp.startsWith("PING"))
     emit sendData("NOTICE " + nick + " :\001PING"); */

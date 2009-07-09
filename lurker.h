@@ -54,6 +54,7 @@ private:
   QString server;
   int port;
   int status;
+  QString passwd;
   QString chans;
   QString ownNick;
   QString ident;
