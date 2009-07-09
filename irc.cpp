@@ -221,10 +221,9 @@ void Irc::parse(QString raw) {
 void Irc::connected() {
   emit gotConnection();
   if(!passwd.isEmpty())
-    sendData("PASS :" + passwd, true);
-  else
-    sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " " + \
-         server + " :" + realname);
+    sendData("PASS :" + passwd);
+  sendData("NICK " + ownNick + "\nUSER " + ident + " " + ownNick + " " + \
+    server + " :" + realname);
   status = STATUS_AUTOJOINING;
 }
 
