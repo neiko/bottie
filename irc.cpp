@@ -60,10 +60,13 @@ void Irc::readData() {
   bool taking = false;
   if(indata.right (2)!= "\r\n")
     taking = true;
+
   QStringList list = indata.split( "\r\n", QString::SkipEmptyParts );
-  if( taking )
-  {indata = list.back();
-   list.removeLast();}
+
+  if( taking ) {
+    indata = list.back();
+    list.removeLast();
+  }
 
   foreach(QString pendingString,list)
     parse(QString::fromUtf8(qPrintable(pendingString)));
@@ -207,6 +210,15 @@ void Irc::parse(QString raw) {
         break;
       case 333: //topic timestamp
         emit topicTime(matrix[3],matrix[4],matrix[5]);
+        break;
+      case 372: // texto de motd
+        emit motd( raw.right((raw.length() - 2) - raw.indexOf(" :")));
+        break;
+      case 375: // inicio de motd
+        emit motdStart( raw.right((raw.length() - 2) - raw.indexOf(" :")));
+        break;
+      case 376: // fin de motd
+        emit motdEnd( raw.right((raw.length() - 2) - raw.indexOf(" :")));
         break;
       case 433: // nick en uso!
         getNewRandomNick();

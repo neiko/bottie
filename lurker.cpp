@@ -67,6 +67,9 @@ Lurker::Lurker()
   connect(interface, SIGNAL(modeChange(QString,QString,QString,QString)), this, SLOT(modeChange(QString,QString,QString,QString)));
   connect(interface, SIGNAL(kick(QString,QString,QString,QString,QString)), this, SLOT(kick(QString,QString,QString,QString,QString)));
   connect(interface, SIGNAL(usedNick(QString,QString)), this, SLOT(usedNick(QString,QString)));
+  connect(interface, SIGNAL(motdStart(QString)), this, SLOT(motdStart(QString)));
+  connect(interface, SIGNAL(motd(QString)), this, SLOT(motd(QString)));
+  connect(interface, SIGNAL(motdEnd(QString)), this, SLOT(motdEnd(QString)));
 
 
   connect(this, SIGNAL(sendData(QString)), interface, SLOT(sendData(QString)));
@@ -396,3 +399,28 @@ void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
     emit sendData("NOTICE " + nick + " :\001PING"); */
 
 }
+
+void Lurker::motdStart(QString motd) {
+  timestamp();
+  out("[");
+  out("MOTD", OUT_COLORED, COLOR_RED, true);
+  out("] ");
+  out(motd + '\n', OUT_COLORED, COLOR_WHITE);
+}
+
+void Lurker::motd(QString motd) {
+  timestamp();
+  out("[");
+  out("MOTD", OUT_COLORED, COLOR_GREEN, true);
+  out("] ");
+  out(motd + '\n', OUT_COLORED, COLOR_WHITE);
+}
+
+void Lurker::motdEnd(QString motd) {
+  timestamp();
+  out("[");
+  out("MOTD", OUT_COLORED, COLOR_RED, true);
+  out("] ");
+  out(motd + '\n', OUT_COLORED, COLOR_WHITE);
+}
+
