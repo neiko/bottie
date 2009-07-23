@@ -9,6 +9,8 @@ CONFIG -= app_bundle
 TEMPLATE = app
 SOURCES += main.cpp \
     irc.cpp \
-    lurker.cpp
+    lurker.cpp \
+    chan.cpp
 HEADERS += irc.h \
-    lurker.h
+    lurker.h \
+    chan.h

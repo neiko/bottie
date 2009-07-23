@@ -21,12 +21,15 @@
 #ifndef LURKER_H
 #define LURKER_H
 
+#define MAX_CHANS 10 // define the max number of chans that could be joined at once.
+
 #endif // LURKER_H
 
 #include <QtCore>
 #include <QString>
 #include <QSettings>
 #include "irc.h"
+#include "chan.h"
 
 #define OUT 0
 #define OUT_CLEAN 1
@@ -65,6 +68,9 @@ private:
   void out(QString,int,int);
   void out(QString,int,int,bool);
   void timestamp();
+  QStringList joinedChans;
+  Chan *chanptr[MAX_CHANS];
+  int findIdByChan( QString );
 
 signals:
   void sendData(QString);
@@ -99,4 +105,6 @@ public slots:
   void motdEnd(QString);
   void listResults( QStringList, QStringList, QStringList );
   void signedIn();
+  void processEnnui();
+  void gotDepressed(QString);
 };
