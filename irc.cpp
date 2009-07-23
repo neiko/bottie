@@ -278,9 +278,9 @@ void Irc::getNewRandomNick() {
   emit ownNickChange ( newNick );
 }
 
-void Irc::handleChanlist(QString channame, QString userscount, QString topic) {
+void Irc::handleChanlist(QString channame, QString users, QString topic) {
     channames.append( channame );
-    userscount.append( userscount );
+    userscount.append( users );
     chantopics.append( topic );
 }
 

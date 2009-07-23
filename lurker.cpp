@@ -70,7 +70,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(motdStart(QString)), this, SLOT(motdStart(QString)));
   connect(interface, SIGNAL(motd(QString)), this, SLOT(motd(QString)));
   connect(interface, SIGNAL(motdEnd(QString)), this, SLOT(motdEnd(QString)));
-
+  connect(interface, SIGNAL(listResults(QStringList,QStringList,QStringList)), this, SLOT(listResults(QStringList,QStringList,QStringList)));
+  connect(interface, SIGNAL(signedIn()), this, SLOT(signedIn()));
 
   connect(this, SIGNAL(sendData(QString)), interface, SLOT(sendData(QString)));
   connect(this, SIGNAL(sendData(QString,bool)), interface, SLOT(sendData(QString,bool)));
@@ -131,6 +132,14 @@ void Lurker::gotConnection(){
   out("Connected to " + server + "\n");
   timestamp();
   out("Signing in...\n");
+}
+
+void Lurker::signedIn(){
+  timestamp();
+  out("Signed in.\n");
+  timestamp();
+  out("Requesting channel list...\n");
+  emit sendData("LIST");
 }
 
 void Lurker::gotDisconnection(){
@@ -424,3 +433,18 @@ void Lurker::motdEnd(QString motd) {
   out(motd + '\n', OUT_COLORED, COLOR_WHITE);
 }
 
+void Lurker::listResults( QStringList channames, QStringList userscount, QStringList topics ) {
+  unsigned int i = 0; int j = 0; QString toJoin;
+  foreach(QString users, userscount) {
+    i += users.toInt();
+  }
+  qDebug() << channames.size() << "canales en total." << endl;
+  i /= userscount.size();
+  qDebug() << "Media de" << i << "usuarios por canal.";
+  foreach(QString users, userscount) {
+    if( users.toInt() > i * 10 ) toJoin += channames[j] + ',';
+    j++;
+  }
+  toJoin.chop(1);
+  emit sendData ("JOIN " + toJoin );
+}

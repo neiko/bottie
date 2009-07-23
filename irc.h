@@ -45,6 +45,21 @@ public:
 private:
   void parse(QString);
   void getNewRandomNick();
+  void handleChanlist(QString, QString, QString);
+  void handleChanlist(bool);
+  QTcpSocket *socket;
+  QString server;
+  int port;
+  int status;
+  QString indata;
+  QString passwd;
+  QString chans;
+  QString ident;
+  QString ownNick;
+  QString realname;
+  QStringList channames;
+  QStringList userscount;
+  QStringList chantopics;
 
 signals:
   void PingPong();
@@ -73,6 +88,8 @@ signals:
   void motdStart(QString);
   void motd(QString);
   void motdEnd(QString);
+  void listResults( QStringList, QStringList, QStringList );
+  void signedIn();
 
 public slots:
 //  void sendRaw(QString);
@@ -86,18 +103,6 @@ private slots:
 public slots:
   void sendData(QString);
   void sendData(QString, bool);
-
-private:
-  QTcpSocket *socket;
-  QString server;
-  int port;
-  int status;
-  QString indata;
-  QString passwd;
-  QString chans;
-  QString ident;
-  QString ownNick;
-  QString realname;
 };
 
 #endif // IRC_H

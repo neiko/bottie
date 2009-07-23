@@ -97,4 +97,6 @@ public slots:
   void motdStart(QString);
   void motd(QString);
   void motdEnd(QString);
+  void listResults( QStringList, QStringList, QStringList );
+  void signedIn();
 };
