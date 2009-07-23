@@ -70,6 +70,8 @@ void Irc::readData() {
 
   foreach(QString pendingString,list)
     parse(QString::fromUtf8(qPrintable(pendingString)));
+
+  if(indata.endsWith("\r\n")) indata.clear();
 }
 
 void Irc::parse(QString raw) {
