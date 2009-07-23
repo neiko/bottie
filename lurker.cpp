@@ -438,9 +438,7 @@ void Lurker::listResults( QStringList channames, QStringList userscount, QString
   foreach(QString users, userscount) {
     i += users.toInt();
   }
-  qDebug() << channames.size() << "canales en total." << endl;
   i /= userscount.size();
-  qDebug() << "Media de" << i << "usuarios por canal.";
   foreach(QString users, userscount) {
     if( users.toInt() > i * 10 ) toJoin += channames[j] + ',';
     j++;
