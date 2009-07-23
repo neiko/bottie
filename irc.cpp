@@ -70,8 +70,6 @@ void Irc::readData() {
 
   foreach(QString pendingString,list)
     parse(QString::fromUtf8(qPrintable(pendingString)));
-
-  indata.clear();
 }
 
 void Irc::parse(QString raw) {
@@ -102,8 +100,7 @@ void Irc::parse(QString raw) {
 
   QStringList matrix = raw.split(' ');
   if( matrix[0] == "PING" ) { // Recibido ping, pongoneamos.
-    indata[1] = 'O'; // xD
-    sendData(indata);
+    sendData("PONG " + matrix[1]);
     emit PingPong();
 
   } else if ( matrix[0] == "ERROR" ) { // error de conexion, whichever
@@ -201,9 +198,21 @@ void Irc::parse(QString raw) {
         ownNick = matrix[2];
         break;
       case 266: // fin de conexion, autojoin
-        sendData("JOIN ",true);
-        sendData(chans);
+        if (!chans.isEmpty()) {
+          sendData("JOIN ",true);
+          sendData(chans);
+        }
         status = STATUS_IDLE;
+        emit signedIn();
+        break;
+      case 321: // chanlist begin
+        handleChanlist(false);
+        break;
+      case 322: // chanlist
+        handleChanlist(matrix[3],matrix[4],raw.right((raw.length() - 2) - raw.indexOf(" :")));
+        break;
+      case 323: // chanlist end
+        handleChanlist(true);
         break;
       case 332: //topic
         emit topic(matrix[3],raw.right((raw.length() - 2) - raw.indexOf(" :")));
@@ -265,4 +274,20 @@ void Irc::getNewRandomNick() {
   sendData("NICK ",true);
   sendData(newNick);
   emit ownNickChange ( newNick );
+}
+
+void Irc::handleChanlist(QString channame, QString userscount, QString topic) {
+    channames.append( channame );
+    userscount.append( userscount );
+    chantopics.append( topic );
+}
+
+void Irc::handleChanlist(bool end) {
+  if ( end == false ) {
+    channames.clear();
+    userscount.clear();
+    chantopics.clear();
+  } else if ( end == true ) {
+    emit listResults( channames, userscount, chantopics );
+  }
 }

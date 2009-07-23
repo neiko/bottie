@@ -1,5 +1,4 @@
 Core module
-- avoid assertion fails (how?, CRITIC)
 - handle unhandled numerics
 - signals for everything
 - fill a QStringList with nicks in channel AND MODES on join
