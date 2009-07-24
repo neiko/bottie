@@ -43,6 +43,8 @@ Irc::Irc(QString iserver, int iport, QString iownNick, QString ichans, QString i
   connect( socket, SIGNAL( error( QAbstractSocket::SocketError ) ), this, SLOT( displayError( QAbstractSocket::SocketError ) ) );
 
   status = STATUS_LOGGING_IN;
+
+  srand (time(NULL));
 }
 
 void Irc::goConnect() {
@@ -55,7 +57,7 @@ void Irc::goDisconnect() {
 
 void Irc::readData() {
   indata += socket->readAll();
-  //qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
+  qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
 
   bool taking = false;
   if(indata.right (2)!= "\r\n")
@@ -268,8 +270,7 @@ void Irc::sendData(QString outdata, bool noTrail) {
 
 void Irc::getNewRandomNick() {
   QString ran, newNick = ownNick;
-  int i;
-  do i = rand(); while ( i < 99 || i > 999 );
+  int i = rand() % (999 - 99 + 1) + 99;
   ran.setNum(i);
   newNick.append(ran);
   emit usedNick ( ownNick, newNick );
