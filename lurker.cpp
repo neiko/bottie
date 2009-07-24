@@ -474,7 +474,7 @@ void Lurker::listResults( QStringList channames, QStringList userscount, QString
     j++;
   }
 
-  for ( int j = 0; j < MAX_CHANS ; j++)
+  for ( int j = 0; j < MAX_CHANS - howManyChans(); j++)
     toJoin += candidates[rand() % (candidates.length() + 1)] + ",";
 
   toJoin.chop(1);
