@@ -57,7 +57,7 @@ void Irc::goDisconnect() {
 
 void Irc::readData() {
   indata += socket->readAll();
-  qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
+  //qDebug() << indata << endl; // with this enabled bottie will output to console every raw it reads
 
   bool taking = false;
   if(indata.right (2)!= "\r\n")
