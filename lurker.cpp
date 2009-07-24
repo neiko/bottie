@@ -462,23 +462,24 @@ void Lurker::motdEnd(QString motd) {
 }
 
 void Lurker::listResults( QStringList channames, QStringList userscount, QStringList topics ) {
-  unsigned int i = 0; int j = 0; QStringList candidates; QString toJoin;
+  unsigned int i = 0; int j = 0; QStringList candidates; QStringList realCandidates; QString toJoin;
 
   foreach(QString users, userscount)
     i += users.toInt();
   i /= userscount.size();
 
   foreach(QString users, userscount) {
-    if( users.toInt() > ( i - ( i / 5 ) ) && users.toInt() < ( i + ( i / 5 ) ) ) {
+    if( users.toInt() > ( i - ( i / 3 ) ) && users.toInt() < ( i + ( i / 3 ) ) ) {
       candidates += channames[j];
       j++;
     }
   }
 
-  for ( int k = 0; k < MAX_CHANS ; k++)
-    toJoin += candidates[k] + ',';
+  for ( int j = 0; j < MAX_CHANS ; j++)
+    toJoin += candidates[rand() % (candidates.length() + 1)] + ",";
 
   toJoin.chop(1);
+  qDebug() << "TRYING TO JOIN " << toJoin<<endl;
   emit sendData ( "JOIN " + toJoin );
 }
 
@@ -486,8 +487,8 @@ void Lurker::processEnnui() {
   for ( int i = 0; i < joinedChans.length(); i++ )
     if ( joinedChans[i] != "," )
       reEnnui ( joinedChans[i].split(",")[0], -1 );
-  if ( howManyChans() == 0 ) // Me quedé solo
-    emit sendData ("LIST");
+  //if ( howManyChans() == 0 ) // Me quedé solo
+    //emit sendData ("LIST");
 }
 
 void Lurker::create( QString chan ) {
