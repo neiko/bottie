@@ -11,10 +11,8 @@ Q_OBJECT
 public:
     Chan(QString);
     ~Chan();
-    void down(int);
-    void up(int);
-    int getEnnui() { return ennui; }
-    void process();
+    void change(int);
+    unsigned int getEnnui() { return ennui; }
 
 signals:
     void gotDepressed(QString);

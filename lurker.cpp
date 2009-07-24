@@ -44,10 +44,6 @@ Lurker::Lurker()
 
   interface->goConnect();
 
-  QTimer *timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(processEnnui()));
-  timer->start(1000);
-
   connect(interface, SIGNAL(gotConnection()), this, SLOT(gotConnection()));
   connect(interface, SIGNAL(gotDisconnection()), this, SLOT(gotDisconnection()));
   connect(interface, SIGNAL(PingPong()), this, SLOT(PingPong()));
@@ -79,9 +75,6 @@ Lurker::Lurker()
 
   connect(this, SIGNAL(sendData(QString)), interface, SLOT(sendData(QString)));
   connect(this, SIGNAL(sendData(QString,bool)), interface, SLOT(sendData(QString,bool)));
-
-
-
 }
 
 
@@ -147,6 +140,10 @@ void Lurker::signedIn(){
   timestamp();
   out("Requesting channel list...\n");
   emit sendData("LIST");
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(processEnnui()));
+  timer->start(1000);
 }
 
 void Lurker::gotDisconnection(){
@@ -167,18 +164,14 @@ void Lurker::join(QString nick,QString mask,QString chan) {
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) { // JOIN propio o ajeno???
     out("I have",OUT_COLORED, COLOR_GREEN);
 
-    joinedChans.append(chan);
-    chanptr[findIdByChan(chan)] = new Chan(chan);
-    connect(chanptr[findIdByChan(chan)], SIGNAL(gotDepressed(QString)), this, SLOT(gotDepressed(QString)));
-
+    create (chan);
   } else {
     out(nick);
     out(" [");
     out(mask,OUT_COLORED, COLOR_GREEN);
     out("]");
 
-    chanptr[findIdByChan(chan)]->up(2);
-
+    reEnnui(chan, 1);
   }
     out(" joined ",OUT_COLORED, COLOR_GREEN);
     out(chan);
@@ -195,8 +188,7 @@ void Lurker::chanmsg(QString nick,QString mask,QString chan,QString message) {
   out(message,OUT_COLORED, COLOR_WHITE);
   out("\n",OUT);
 
-  chanptr[findIdByChan(chan)]->up(1);
-
+  reEnnui(chan, 1);
 }
 
 void Lurker::querymsg(QString nick,QString mask,QString message) {
@@ -218,8 +210,7 @@ void Lurker::chanme(QString nick,QString mask,QString chan,QString message) {
   out(message,OUT_COLORED, COLOR_WHITE);
   out("\n",OUT);
 
-  chanptr[findIdByChan(chan)]->up(1);
-
+  reEnnui(chan, 1);
 }
 
 void Lurker::queryme(QString nick,QString mask,QString message) {
@@ -241,8 +232,7 @@ void Lurker::channotice(QString nick,QString mask,QString chan,QString message) 
   out(message, OUT_COLORED, COLOR_WHITE);
   out("\n", OUT);
 
-  chanptr[findIdByChan(chan)]->down(1); // bot uses to dislike notices
-
+  reEnnui(chan, -1);
 }
 
 void Lurker::querynotice(QString nick,QString mask,QString message) {
@@ -260,18 +250,14 @@ void Lurker::part(QString nick,QString mask,QString chan,QString message) {
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) { // part propio o ajeno???
     out("I've", OUT_COLORED, COLOR_CYAN);
 
-    chanptr[findIdByChan(chan)]->deleteLater();
-    chanptr[findIdByChan(chan)] = NULL;
-    joinedChans.removeOne(chan);
-
+    destroy(chan); // for svsparts and so
   } else {
     out(nick);
     out(" [");
     out(mask,OUT_COLORED, COLOR_CYAN);
     out("]");
 
-    chanptr[findIdByChan(chan)]->down(3); // parting a channel is critical for the user who did it
-
+    reEnnui(chan, -3); // parting a channel is critical for the user who did it
   }
   out(" parted ", OUT_COLORED, COLOR_CYAN);
   out(chan);
@@ -383,14 +369,12 @@ void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QStr
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) { // JOIN propio o ajeno???
     out("I have been kicked from ", OUT_COLORED, COLOR_YELLOW);
 
-    chanptr[findIdByChan(chan)]->deleteLater();
-    chanptr[findIdByChan(chan)] = NULL;           // remove this channel from db
-    joinedChans.removeOne(chan);
+    destroy(chan);
   } else {
     out(kicked);
     out(" was kicked from ", OUT_COLORED, COLOR_CYAN);
 
-    chanptr[findIdByChan(chan)]->down(2); // I HATE KICKS!
+    reEnnui(chan, -3); // I HATE KICKS!
   }
   out(chan);
   out(" by ", OUT_COLORED, COLOR_CYAN);
@@ -404,8 +388,6 @@ void Lurker::kick(QString nick, QString mask, QString chan, QString kicked, QStr
     out("]");
   }
   out("\n");
-
-
 }
 
 void Lurker::usedNick(QString oldNick, QString newNick) {
@@ -430,7 +412,7 @@ void Lurker::chanctcp(QString nick,QString mask,QString chan,QString ctcp) {
   out(chan, OUT_COLORED, COLOR_WHITE, true);
   out("\n");
 
-  chanptr[findIdByChan(chan)]->down(2); // bad karma
+  reEnnui(chan, -3); // don't bother me
 }
 
 void Lurker::queryctcp(QString nick,QString mask,QString ctcp) {
@@ -480,36 +462,88 @@ void Lurker::motdEnd(QString motd) {
 }
 
 void Lurker::listResults( QStringList channames, QStringList userscount, QStringList topics ) {
-  unsigned int i = 0; int j = 0; QString toJoin;
-  foreach(QString users, userscount) {
-    i += users.toInt();
-  }
-  i /= userscount.size();
-  foreach(QString users, userscount) {
-    if( users.toInt() > i * 10 ) toJoin += channames[j] + ',';
-    j++;
-  }
-  toJoin.chop(1);
-  emit sendData ("JOIN " + toJoin );
-}
+  unsigned int i = 0; int j = 0; QStringList candidates; QString toJoin;
 
-int Lurker::findIdByChan( QString channel ) {
-  int i = 0;
-  foreach (QString possibleChan, joinedChans) {
-    if ( possibleChan == channel ) return i;
-    i++;
+  foreach(QString users, userscount)
+    i += users.toInt();
+  i /= userscount.size();
+
+  foreach(QString users, userscount) {
+    if( users.toInt() > ( i - ( i / 5 ) ) && users.toInt() < ( i + ( i / 5 ) ) ) {
+      candidates += channames[j];
+      j++;
+    }
   }
-  return 0;
+
+  for ( int k = 0; k < MAX_CHANS ; k++)
+    toJoin += candidates[k] + ',';
+
+  toJoin.chop(1);
+  emit sendData ( "JOIN " + toJoin );
 }
 
 void Lurker::processEnnui() {
-  foreach (QString availableSlots, joinedChans) {
-    if ( !availableSlots.isEmpty() )
-      chanptr[findIdByChan(availableSlots)]->down(1); // avoid staying on idling chans
-      chanptr[findIdByChan(availableSlots)]->process(); // reprocesa
-    }
+  for ( int i = 0; i < joinedChans.length(); i++ )
+    if ( joinedChans[i] != "," )
+      reEnnui ( joinedChans[i].split(",")[0], -1 );
+  if ( howManyChans() == 0 ) // Me quedé solo
+    emit sendData ("LIST");
 }
 
-void Lurker::gotDepressed(QString chantopart) {
-  emit sendData("PART " + chantopart);
+void Lurker::create( QString chan ) {
+  //find out where's the next slot available
+  int i = 0;
+  if ( !joinedChans.isEmpty() ) { // si sí está vacío, permanecerá a cero. así que nada de else
+    if ( joinedChans.indexOf(",") != -1 ) { // o sea que hay algo vacío
+      i = joinedChans.indexOf(",");
+      QString j; j.setNum(i);
+      joinedChans[i] = chan + "," + j;
+    } else {
+      i = joinedChans.length(); // el siguiente libre.
+      QString j; j.setNum(i);
+      joinedChans.append( chan + "," + j );
+    }
+  } else
+    joinedChans.append( chan + ",0" );
+  chanptr[i] = new Chan(chan);
+  connect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(destroy(QString)));
+}
+
+void Lurker::destroy( QString chan ){
+  // find out where's the channel at
+  foreach ( QString candidate, joinedChans ) {
+    if ( candidate != "," ) { // avoid assertion fails and sigsevs
+      if ( candidate.split(",")[0] == chan ) { // :D
+        int i = candidate.split(",")[1].toInt();
+        disconnect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(destroy(QString)));
+        chanptr[i]->deleteLater();
+        joinedChans[i] = ",";
+        emit sendData("PART " + chan);
+      }
+    }
+  }
+}
+
+void Lurker::reEnnui ( QString chan, int ennui ) {
+  foreach ( QString candidate, joinedChans ) {
+    if ( candidate.startsWith(chan) )
+      chanptr[getIdByChan(chan)]->change(ennui);
+  }
+}
+
+int Lurker::getIdByChan( QString chan ) {
+  foreach (QString candidate, joinedChans) {
+    if ( candidate != "," ) {
+      if ( candidate.split(",")[0] == chan )
+        return candidate.split(",")[1].toInt();
+    }
+  }
+}
+
+int Lurker::howManyChans () {
+  int i = 0;
+  foreach (QString candidate, joinedChans)
+    if ( candidate != "," )
+      i++;
+  return i;
 }

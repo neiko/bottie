@@ -70,7 +70,11 @@ private:
   void timestamp();
   QStringList joinedChans;
   Chan *chanptr[MAX_CHANS];
-  int findIdByChan( QString );
+  int getIdByChan( QString );
+  void reEnnui(QString, int);
+  void create(QString);
+  bool requestingList;
+  int howManyChans();
 
 signals:
   void sendData(QString);
@@ -106,5 +110,5 @@ public slots:
   void listResults( QStringList, QStringList, QStringList );
   void signedIn();
   void processEnnui();
-  void gotDepressed(QString);
+  void destroy(QString);
 };
