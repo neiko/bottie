@@ -10,7 +10,9 @@ TEMPLATE = app
 SOURCES += main.cpp \
     irc.cpp \
     lurker.cpp \
-    chan.cpp
+    chan.cpp \
+    canigen.cpp
 HEADERS += irc.h \
     lurker.h \
-    chan.h
+    chan.h \
+    canigen.h
