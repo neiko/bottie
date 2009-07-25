@@ -34,8 +34,13 @@ Lurker::Lurker()
   port = conf->value("server/port").toInt();
   passwd = conf->value("server/password").toString(); // this passwd is for the SERVER
   chans = conf->value("server/autojoin").toString();
+  shouldUseLocalCode = conf->value("server/localcode").toInt();
 
-  ownNick = conf->value("identity/nick").toString();
+  Canigen *canigen = new Canigen();
+  if ( conf-> value("identity/genre").toString() == "male" )
+    ownNick = canigen->genNew(false);
+  else
+    ownNick = canigen->genNew(false);
   ident = conf->value("identity/ident").toString();
   realname = conf->value("identity/realname").toString();
   myNick = ownNick; // presupondré que no cambia... :p
@@ -470,7 +475,10 @@ void Lurker::listResults( QStringList channames, QStringList userscount, QString
 
   foreach(QString users, userscount) {
     // if( users.toInt() > ( i - ( i / 3 ) ) && users.toInt() < ( i + ( i / 3 ) ) ) {
-    candidates += channames[j];
+    if ( shouldUseLocalCode == 1 )
+      candidates += channames[j].toLocal8Bit();
+    else
+      candidates += channames[j];
     j++;
   }
 
