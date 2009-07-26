@@ -77,6 +77,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(motdEnd(QString)), this, SLOT(motdEnd(QString)));
   connect(interface, SIGNAL(listResults(QStringList,QStringList,QStringList)), this, SLOT(listResults(QStringList,QStringList,QStringList)));
   connect(interface, SIGNAL(signedIn()), this, SLOT(signedIn()));
+  connect(interface, SIGNAL(updateChans( int )), this, SLOT(updateChans( int )));
+  connect(interface, SIGNAL(totalChans( QString )), this, SLOT(totalChans( QString )));
 
   connect(this, SIGNAL(sendData(QString)), interface, SLOT(sendData(QString)));
   connect(this, SIGNAL(sendData(QString,bool)), interface, SLOT(sendData(QString,bool)));
@@ -144,11 +146,7 @@ void Lurker::signedIn(){
   out("Signed in.\n");
   timestamp();
   out("Requesting channel list...\n");
-  emit sendData("LIST");
-
-  QTimer *timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(processEnnui()));
-  timer->start(1000);
+  requestNewList();
 }
 
 void Lurker::gotDisconnection(){
@@ -466,6 +464,20 @@ void Lurker::motdEnd(QString motd) {
   out(motd + '\n', OUT_COLORED, COLOR_WHITE);
 }
 
+void Lurker::showListProcess() {
+  if ( chancount != 0 ) {
+    timestamp();
+    QString *qchancount = new QString;
+    out("  -> Downloading channel list: ", OUT_COLORED, COLOR_CYAN);
+    out(qchancount->setNum(chancount));
+    out(" [");
+    out(qchancount->setNum(chancount * 100 / totalchans));
+    out("%]");
+    out("...\n", OUT_COLORED, COLOR_CYAN);
+  }
+}
+
+
 void Lurker::listResults( QStringList channames, QStringList userscount, QStringList topics ) {
   unsigned int i = 0; int j = 0; QStringList candidates; QString toJoin;
 
@@ -487,14 +499,21 @@ void Lurker::listResults( QStringList channames, QStringList userscount, QString
 
   toJoin.chop(1);
   emit sendData ( "JOIN " + toJoin );
+
+  downloadingList = false;
+  disconnect(process, SIGNAL(timeout()), this, SLOT(showListProcess()));
+  process->stop();
+  process->deleteLater();
+
+  chancount = 0;
 }
 
 void Lurker::processEnnui() {
   for ( int i = 0; i < joinedChans.length(); i++ )
     if ( joinedChans[i] != "," )
       reEnnui ( joinedChans[i].split(",")[0], -1 );
-  if ( howManyChans() <= MAX_CHANS / 5 ) // Me quedo solo
-    emit sendData ("LIST");
+  if ( howManyChans() <= MAX_CHANS / 5 && !downloadingList) // Me quedo solo
+    requestNewList();
 }
 
 void Lurker::create( QString chan ) {
@@ -553,4 +572,28 @@ int Lurker::howManyChans () {
     if ( candidate != "," )
       i++;
   return i;
+}
+
+void Lurker::updateChans( int channum ) {
+  chancount = channum;
+}
+
+void Lurker::totalChans( QString total ) {
+  totalchans = total.toInt();
+}
+
+void Lurker::requestNewList() {
+  downloadingList = true;
+  emit sendData("LUSERS"); // número total de canales
+  emit sendData("LIST");
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(processEnnui()));
+  timer->start(1000);
+
+  process = new QTimer(this);
+  connect(process, SIGNAL(timeout()), this, SLOT(showListProcess()));
+  process->start(3000);
+
+  chancount = 0;
 }

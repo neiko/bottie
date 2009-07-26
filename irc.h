@@ -90,9 +90,8 @@ signals:
   void motdEnd(QString);
   void listResults( QStringList, QStringList, QStringList );
   void signedIn();
-
-public slots:
-//  void sendRaw(QString);
+  void updateChans( int );
+  void totalChans( QString );
 
 private slots:
   void readData();

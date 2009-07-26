@@ -200,8 +200,6 @@ void Irc::parse(QString raw) {
       case 001: // me es útil, así sé con qué nick entro xD
         emit ownNickChange(matrix[2]);
         ownNick = matrix[2];
-        break;
-      case 266: // fin de conexion, autojoin
         if (!chans.isEmpty()) {
           sendData("JOIN ",true);
           sendData(chans);
@@ -209,6 +207,8 @@ void Irc::parse(QString raw) {
         status = STATUS_IDLE;
         emit signedIn();
         break;
+      case 254: // número de canales formados
+        emit totalChans(matrix[3]);
       case 321: // chanlist begin
         handleChanlist(false);
         break;
@@ -259,7 +259,7 @@ void Irc::disconnected() {
 void Irc::displayError(QAbstractSocket::SocketError e) { /* TODO */ }
 
 void Irc::sendData(QString outdata) {
-  // qDebug() << outdata << endl; // with this enabled, debugging of output raws.
+  //qDebug() << outdata << endl; // with this enabled, debugging of output raws.
   socket->write( outdata.toUtf8() + "\r\n" );
 }
 
@@ -283,6 +283,7 @@ void Irc::handleChanlist(QString channame, QString users, QString topic) {
     channames.append( channame );
     userscount.append( users );
     chantopics.append( topic );
+    emit updateChans( channames.size() );
 }
 
 void Irc::handleChanlist(bool end) {

@@ -30,6 +30,7 @@
 #include <QSettings>
 #include "irc.h"
 #include "chan.h"
+#include "canigen.h"
 
 #define OUT 0
 #define OUT_CLEAN 1
@@ -63,6 +64,7 @@ private:
   QString ident;
   QString realname;
   QString myNick;
+  int shouldUseLocalCode;
   void out(QString);
   void out(QString,int);
   void out(QString,int,int);
@@ -73,8 +75,12 @@ private:
   int getIdByChan( QString );
   void reEnnui(QString, int);
   void create(QString);
-  bool requestingList;
+  bool downloadingList;
   int howManyChans();
+  int chancount;
+  void requestNewList();
+  QTimer *process;
+  int totalchans;
 
 signals:
   void sendData(QString);
@@ -111,4 +117,9 @@ public slots:
   void signedIn();
   void processEnnui();
   void destroy(QString);
+  void updateChans (int);
+  void totalChans( QString );
+
+private slots:
+  void showListProcess();
 };
