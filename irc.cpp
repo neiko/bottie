@@ -143,8 +143,10 @@ void Irc::parse(QString raw) {
   } else if ( matrix[1] == "JOIN" ) { //join a un canal
     QString nick = matrix[0].left(matrix[0].indexOf('!'));
     QString mask = matrix[0].mid(matrix[0].indexOf('!') + 1,(matrix[0].indexOf(" JOIN") - nick.length()));
-    QString chan = raw.right((raw.length() - 2) - raw.indexOf(" :"));
-    emit join(nick,mask,chan);
+    if( matrix[2].startsWith(':') )
+        emit join(nick,mask,matrix[2].right( matrix[2].length() -1 ));
+      else
+        emit join(nick,mask,matrix[2]);
 
   } else if ( matrix[1] == "PART" || matrix[1] == "QUIT" ) { //handled together
     QString message = "", chan = "";
@@ -176,9 +178,12 @@ void Irc::parse(QString raw) {
       QString chan = matrix[2];
       QString mode = raw.right((raw.length() - raw.indexOf(" #")) - chan.length() - 2);
       emit modeChange(nick,mask,chan,mode);
+    } else { // u mode
+      if( matrix[3].startsWith(':') )
+        emit umodeChange(matrix[0],matrix[2],matrix[3].right( matrix[3].length() -1 ));
+      else
+        emit umodeChange(matrix[0],matrix[2],matrix[3]);
     }
-    else // u mode
-      emit umodeChange(matrix[0],matrix[2],raw.right((raw.length() - 2) - raw.indexOf(" :")));
   } else if ( matrix[1] == "KICK" ) { // expulsión del canal
     if ( matrix[2].startsWith('#') ) { // c mode
       QString nick = matrix[0].left(matrix[0].indexOf('!'));
@@ -235,6 +240,18 @@ void Irc::parse(QString raw) {
         break;
       case 433: // nick en uso!
         getNewRandomNick();
+        break;
+      case 471:
+        qDebug() << matrix[3] << "Cannot join channel (+l)";
+        break;
+      case 473:
+        qDebug() << matrix[3] << "Cannot join channel (+i)";
+        break;
+      case 474:
+        qDebug() << matrix[3] << "Cannot join channel (+b)";
+        break;
+      case 475:
+        qDebug() << matrix[3] << "Cannot join channel (+k)";
         break;
       default:
         //qDebug() << "Numeric NO MANEJADO!" << matrix[1] << endl;
