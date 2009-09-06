@@ -253,7 +253,8 @@ void Lurker::part(QString nick,QString mask,QString chan,QString message) {
   if (!QString::compare(nick, myNick, Qt::CaseInsensitive)) { // part propio o ajeno???
     out("I've", OUT_COLORED, COLOR_CYAN);
 
-    destroy(chan); // for svsparts and so
+    destroy(chan);
+
   } else {
     out(nick);
     out(" [");
@@ -512,7 +513,7 @@ void Lurker::processEnnui() {
   for ( int i = 0; i < joinedChans.length(); i++ )
     if ( joinedChans[i] != "," )
       reEnnui ( joinedChans[i].split(",")[0], -1 );
-  if ( howManyChans() <= MAX_CHANS / 5 && !downloadingList) // Me quedo solo
+  if ( howManyChans() <= 1 && !downloadingList) // Me quedo solo
     requestNewList();
 }
 
@@ -532,7 +533,7 @@ void Lurker::create( QString chan ) {
   } else
     joinedChans.append( chan + ",0" );
   chanptr[i] = new Chan(chan);
-  connect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(destroy(QString)));
+  connect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(doPart(QString)));
 }
 
 void Lurker::destroy( QString chan ){
@@ -541,10 +542,10 @@ void Lurker::destroy( QString chan ){
     if ( candidate != "," ) { // avoid assertion fails and sigsevs
       if ( candidate.split(",")[0] == chan ) { // :D
         int i = candidate.split(",")[1].toInt();
-        disconnect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(destroy(QString)));
-        chanptr[i]->deleteLater();
         joinedChans[i] = ",";
-        emit sendData("PART " + chan);
+        disconnect(chanptr[i], SIGNAL(gotDepressed(QString)), this, SLOT(doPart(QString)));
+        chanptr[i]->deleteLater();
+        // emit sendData("PART " + chan); // unnecessary?
       }
     }
   }
@@ -564,6 +565,7 @@ int Lurker::getIdByChan( QString chan ) {
         return candidate.split(",")[1].toInt();
     }
   }
+  return -1;
 }
 
 int Lurker::howManyChans () {
@@ -596,4 +598,8 @@ void Lurker::requestNewList() {
   process->start(3000);
 
   chancount = 0;
+}
+
+void Lurker::doPart(QString chan) {
+  emit sendData("PART " + chan);
 }
