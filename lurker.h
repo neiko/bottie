@@ -119,6 +119,7 @@ public slots:
   void destroy(QString);
   void updateChans (int);
   void totalChans( QString );
+  void doPart (QString);
 
 private slots:
   void showListProcess();
