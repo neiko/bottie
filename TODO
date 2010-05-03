@@ -1,4 +1,4 @@
-Core module
+Irc module
 - handle unhandled numerics
 - signals for everything
 - fill a QStringList with nicks in channel AND MODES on join
@@ -8,8 +8,10 @@ Core module
 
 Lurker module
 - enhance mode handling
-- o/c, nicklist on join
 - show chanmode before nick on chanmsg
 - show common channels on querymsg
 - port linux console colors to windows
 - logging to files (yay!)
+
+Generally:
+- make it do something!

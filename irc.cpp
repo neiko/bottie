@@ -229,6 +229,12 @@ void Irc::parse(QString raw) {
       case 333: //topic timestamp
         emit topicTime(matrix[3],matrix[4],matrix[5]);
         break;
+      case 353: // names
+        emit names(matrix[4], raw.right((raw.length() - 2) - raw.indexOf(" :")));
+        break;
+      case 366: // fin de /names
+        emit namesEnd(matrix[3]);
+        break;
       case 372: // texto de motd
         emit motd( raw.right((raw.length() - 2) - raw.indexOf(" :")));
         break;

@@ -79,6 +79,8 @@ signals:
   void quit(QString,QString,QString);
   void nickChange(QString,QString,QString);
   void connError(QString);
+  void names(QString,QString);
+  void namesEnd(QString);
   void topic(QString,QString);
   void topicTime(QString,QString,QString);
   void umodeChange(QString,QString,QString);

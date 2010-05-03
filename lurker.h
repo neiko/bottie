@@ -112,6 +112,8 @@ public slots:
   void umodeChange(QString,QString,QString);
   void modeChange(QString,QString,QString,QString);
   void kick(QString,QString,QString,QString,QString);
+  void names(QString,QString);
+  void namesEnd(QString);
   void usedNick(QString,QString);
   void motdStart(QString);
   void motd(QString);

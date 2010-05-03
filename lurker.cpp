@@ -79,6 +79,8 @@ Lurker::Lurker()
   connect(interface, SIGNAL(modeChange(QString,QString,QString,QString)), this, SLOT(modeChange(QString,QString,QString,QString)));
   connect(interface, SIGNAL(kick(QString,QString,QString,QString,QString)), this, SLOT(kick(QString,QString,QString,QString,QString)));
   connect(interface, SIGNAL(usedNick(QString,QString)), this, SLOT(usedNick(QString,QString)));
+  connect(interface, SIGNAL(names(QString,QString)), this, SLOT(names(QString,QString)));
+  connect(interface, SIGNAL(namesEnd(QString)), this, SLOT(namesEnd(QString)));
   connect(interface, SIGNAL(motdStart(QString)), this, SLOT(motdStart(QString)));
   connect(interface, SIGNAL(motd(QString)), this, SLOT(motd(QString)));
   connect(interface, SIGNAL(motdEnd(QString)), this, SLOT(motdEnd(QString)));
@@ -329,6 +331,22 @@ void Lurker::connError(QString errdesc) {
   out(errdesc + "\n", OUT_COLORED, COLOR_RED, true);
   // Sad but true, a connection error is FATAL for us.
   exit(1);
+}
+
+void Lurker::names(QString chan,QString names_) {
+  timestamp();
+  out("  -> Users for ",OUT_COLORED, COLOR_CYAN);
+  out(chan);
+  out(": ", OUT_COLORED, COLOR_CYAN);
+  out(names_);
+  out("\n");
+}
+
+void Lurker::namesEnd(QString chan) {
+  timestamp();
+  out("  -> End of user list for ",OUT_COLORED, COLOR_CYAN);
+  out(chan);
+  out("\n");
 }
 
 void Lurker::topic(QString chan,QString topic_) {
@@ -588,6 +606,7 @@ void Lurker::requestNewList() {
     emit sendData("LUSERS"); // número total de canales
     emit sendData("LIST");
     lastRequestedList = time(NULL);
+  }
 
   process = new QTimer(this);
   connect(process, SIGNAL(timeout()), this, SLOT(showListProcess()));
