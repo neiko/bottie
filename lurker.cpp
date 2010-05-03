@@ -584,14 +584,10 @@ void Lurker::totalChans( QString total ) {
 void Lurker::requestNewList() {
 
   if (lastRequestedList + 30 < time(NULL)) { // no pedir una lista cada menos de 30s
-    qDebug() << "PIDIENDO NUEVA LISTA!!";
     downloadingList = true;
     emit sendData("LUSERS"); // número total de canales
     emit sendData("LIST");
     lastRequestedList = time(NULL);
-  } else {
-    qDebug() << "NO PEDIRÉ OTRA AÚN.";
-  }
 
   process = new QTimer(this);
   connect(process, SIGNAL(timeout()), this, SLOT(showListProcess()));
@@ -611,7 +607,6 @@ void Lurker::processChannelQueueTimer() {
         toJoin.removeFirst();
         toJoin.removeFirst();
         toJoin.removeFirst();
-        qDebug() << "SE ENTRARá a" << aux;
         emit sendData ( "JOIN " + aux );
     }
 }
