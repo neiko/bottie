@@ -81,6 +81,9 @@ private:
   void requestNewList();
   QTimer *process;
   int totalchans;
+  QTimer * channelQueueTimer;
+  QStringList toJoin;
+  long lastRequestedList;
 
 signals:
   void sendData(QString);
@@ -119,8 +122,9 @@ public slots:
   void destroy(QString);
   void updateChans (int);
   void totalChans( QString );
-  void doPart (QString);
+  void doPart( QString );
 
 private slots:
   void showListProcess();
+  void processChannelQueueTimer();
 };

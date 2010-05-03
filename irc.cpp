@@ -71,7 +71,7 @@ void Irc::readData() {
   }
 
   foreach(QString pendingString,list)
-    parse(QString::fromUtf8(qPrintable(pendingString)));
+    parse(QString::fromUtf8(qPrintable(QString(pendingString.toLatin1()))));
 
   if(indata.endsWith("\r\n")) indata.clear();
 }
@@ -277,12 +277,14 @@ void Irc::displayError(QAbstractSocket::SocketError e) { /* TODO */ }
 
 void Irc::sendData(QString outdata) {
   //qDebug() << outdata << endl; // with this enabled, debugging of output raws.
-  socket->write( outdata.toUtf8() + "\r\n" );
+  socket->write( outdata.toAscii() + "\r\n" );
 }
 
 void Irc::sendData(QString outdata, bool noTrail) {
   if (noTrail == true)
-    socket->write( outdata.toUtf8() );
+    socket->write( outdata.toAscii() );
+  else
+    socket->write( outdata.toAscii() + "\r\n" );
 }
 
 void Irc::getNewRandomNick() {
@@ -297,7 +299,7 @@ void Irc::getNewRandomNick() {
 }
 
 void Irc::handleChanlist(QString channame, QString users, QString topic) {
-    channames.append( channame );
+    channames.append( channame.toLatin1() );
     userscount.append( users );
     chantopics.append( topic );
     emit updateChans( channames.size() );
